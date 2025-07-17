@@ -7,7 +7,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.recyclerequestapp.R; // Make sure this points to your R file
-import com.example.recyclerequestapp.data.Request;
+import com.example.recyclerequestapp.model.Request;
 import java.util.List;
 
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
