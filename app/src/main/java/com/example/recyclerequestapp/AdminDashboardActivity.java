@@ -28,7 +28,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         btnViewAllRequests.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(AdminDashboardActivity.this, ViewRequestsActivity.class);
+                Intent intent = new Intent(AdminDashboardActivity.this, ViewAllRequestsActivity.class);
                 startActivity(intent);
             }
         });

@@ -24,7 +24,7 @@ public class UserDashboardActivity extends AppCompatActivity {
 
         // View Requests
         btnViewRequests.setOnClickListener(v -> {
-            Intent intent = new Intent(UserDashboardActivity.this, ViewRequestsActivity.class);
+            Intent intent = new Intent(UserDashboardActivity.this, ViewAllRequestsActivity.class);
             startActivity(intent);
         });
 

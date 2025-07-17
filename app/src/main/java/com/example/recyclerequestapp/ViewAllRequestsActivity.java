@@ -23,7 +23,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ViewRequestsActivity extends AppCompatActivity {
+public class ViewAllRequestsActivity extends AppCompatActivity {
 
     private RecyclerView recyclerViewRequests;
     private RequestAdapter requestAdapter;
@@ -35,7 +35,7 @@ public class ViewRequestsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_requests); // Link to the new layout
+        setContentView(R.layout.activity_view_all_requests); // Link to the new layout
 
         // Optional: Add a back button to the action bar
         if (getSupportActionBar() != null) {
@@ -71,14 +71,14 @@ public class ViewRequestsActivity extends AppCompatActivity {
                     requestAdapter.setRequestList(fetchedRequests); // Display all fetched requests
                     Log.d("ViewAllRequests", "Requests fetched successfully: " + fetchedRequests.size());
                 } else {
-                    Toast.makeText(ViewRequestsActivity.this, "Failed to fetch requests: " + response.message(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ViewAllRequestsActivity.this, "Failed to fetch requests: " + response.message(), Toast.LENGTH_SHORT).show();
                     Log.e("ViewAllRequests", "Error response: " + response.code() + " " + response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<List<Request>> call, Throwable t) {
-                Toast.makeText(ViewRequestsActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(ViewAllRequestsActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
                 Log.e("ViewAllRequests", "Network error fetching requests", t);
             }
         });

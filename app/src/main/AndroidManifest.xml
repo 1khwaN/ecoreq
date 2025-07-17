@@ -27,7 +27,7 @@
             />
 
         <activity android:name=".CancelRequestActivity" />
-        <activity android:name=".ViewRequestsActivity" />
+        <activity android:name=".ViewAllRequestsActivity" />
         <activity android:name=".AdminDashboardActivity"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
         <activity android:name=".UserDashboardActivity"
