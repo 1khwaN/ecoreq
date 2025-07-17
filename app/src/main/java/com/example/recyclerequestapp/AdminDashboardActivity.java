@@ -9,6 +9,9 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+// Assuming you have this for logout functionality
+import com.example.recyclerequestapp.SharedPrefManager;
+
 public class AdminDashboardActivity extends AppCompatActivity {
 
     // Declare buttons
@@ -25,13 +28,10 @@ public class AdminDashboardActivity extends AppCompatActivity {
         btnAddRecyclableItem = findViewById(R.id.btnAddRecyclableItem);
         btnUpdateRecyclableItem = findViewById(R.id.btnUpdateRecyclableItem);
 
-        // Button: View All Requests
-         btnViewAllRequests.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(AdminDashboardActivity.this, ViewAllRequestsActivity.class);
-                startActivity(intent);
-            }
+        // Button: View All Requests (using lambda for consistency, fixes warning 5)
+        btnViewAllRequests.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, ViewAllRequestsActivity.class);
+            startActivity(intent);
         });
 
         // Button: Update Request Status
@@ -46,8 +46,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Button: Update Recyclable Item
+        // Button: Update Recyclable Item (FIXED: declare intent, fixes error 4)
         btnUpdateRecyclableItem.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, UpdateRecyclableItemActivity.class); // <-- FIX HERE
             startActivity(intent);
         });
     }
@@ -64,6 +65,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_logout) {
             // Clear session
+            // Ensure SharedPrefManager is correctly imported and implemented
             SharedPrefManager spm = new SharedPrefManager(getApplicationContext());
             spm.logout();
 
