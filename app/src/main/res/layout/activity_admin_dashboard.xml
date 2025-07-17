@@ -7,10 +7,12 @@
     android:fitsSystemWindows="true"
     android:padding="24dp">
 
-    <LinearLayout
+    <Button
+        android:id="@+id/btnViewAllRequests"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:text="View All Requests"
+        android:layout_marginBottom="16dp" />
 
         <!-- Header -->
         <TextView
@@ -122,6 +124,4 @@
             android:layout_height="wrap_content"
             tools:listitem="@layout/item_request" />
 
-
-    </LinearLayout>
-</ScrollView>
+</LinearLayout>

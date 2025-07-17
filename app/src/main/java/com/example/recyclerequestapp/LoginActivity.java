@@ -2,8 +2,16 @@ package com.example.recyclerequestapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.*;
+import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.recyclerequestapp.model.User;
 import com.example.recyclerequestapp.remote.ApiUtils;
@@ -15,69 +23,110 @@ import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText edtUsername, edtPassword;
-    private RadioGroup roleRadioGroup;
-    private Button btnLogin;
-    private TextView textViewRegister;
-
-    private UserService userService;
+    private EditText edtUsername;
+    private EditText edtPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
 
-        // Link components
+        // ✅ Auto-login if user is already logged in
+        SharedPrefManager spm = new SharedPrefManager(getApplicationContext());
+        if (spm.isLoggedIn()) {
+            User user = spm.getUser();
+            String role = user.getRole();
+
+            Intent intent;
+            if ("admin".equalsIgnoreCase(role)) {
+                intent = new Intent(this, AdminDashboardActivity.class);
+            } else {
+                intent = new Intent(this, UserDashboardActivity.class);
+            }
+
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            return;
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.login), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
         edtUsername = findViewById(R.id.edtUsername);
         edtPassword = findViewById(R.id.edtPassword);
-        roleRadioGroup = findViewById(R.id.roleRadioGroup);
-        btnLogin = findViewById(R.id.btnLogin);
-
-        userService = ApiUtils.getUserService();
-
-        btnLogin.setOnClickListener(v -> loginClicked());
     }
 
-    private void loginClicked() {
+    public void loginClicked(View view) {
         String username = edtUsername.getText().toString().trim();
         String password = edtPassword.getText().toString().trim();
 
-        if (username.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
-            return;
+        if (validateLogin(username, password)) {
+            doLogin(username, password);
         }
+    }
 
-        int selectedId = roleRadioGroup.getCheckedRadioButtonId();
-        if (selectedId == -1) {
-            Toast.makeText(this, "Please select a role", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+    private void doLogin(String username, String password) {
+        UserService userService = ApiUtils.getUserService();
         Call<User> call = userService.login(username, password);
+
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
-                if (response.isSuccessful() && response.body() != null) {
+                if (response.isSuccessful()) {
                     User user = response.body();
 
-                    if (selectedId == R.id.radioUser) {
-                        startActivity(new Intent(LoginActivity.this, UserDashboardActivity.class));
-                        Toast.makeText(LoginActivity.this, "Logged in as User", Toast.LENGTH_SHORT).show();
-                    } else if (selectedId == R.id.radioAdmin) {
-                        startActivity(new Intent(LoginActivity.this, AdminDashboardActivity.class));
-                        Toast.makeText(LoginActivity.this, "Logged in as Admin", Toast.LENGTH_SHORT).show();
-                    }
+                    if (user != null && user.getToken() != null) {
+                        // Save user session
+                        SharedPrefManager spm = new SharedPrefManager(getApplicationContext());
+                        spm.storeUser(user);
 
-                    // Optionally: Save token using SharedPreferences here
+                        displayToast("Login successful");
+
+                        // Redirect based on role
+                        String role = user.getRole();
+                        Intent intent;
+
+                        if ("admin".equalsIgnoreCase(role)) {
+                            intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
+                        } else {
+                            intent = new Intent(LoginActivity.this, UserDashboardActivity.class);
+                        }
+
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    } else {
+                        displayToast("Login failed: invalid user or token.");
+                    }
                 } else {
-                    Toast.makeText(LoginActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
+                    displayToast("Login failed: check your credentials.");
                 }
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-                Toast.makeText(LoginActivity.this, "Failed to connect to server", Toast.LENGTH_SHORT).show();
+                displayToast("Error connecting to server.");
+                Log.e("LoginError", t.getMessage(), t);
             }
         });
+    }
+
+    private boolean validateLogin(String username, String password) {
+        if (username.isEmpty()) {
+            displayToast("Username is required.");
+            return false;
+        }
+        if (password.isEmpty()) {
+            displayToast("Password is required.");
+            return false;
+        }
+        return true;
+    }
+
+    private void displayToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }
