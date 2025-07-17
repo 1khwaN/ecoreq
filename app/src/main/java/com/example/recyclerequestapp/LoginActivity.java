@@ -32,7 +32,6 @@ public class LoginActivity extends AppCompatActivity {
         edtPassword = findViewById(R.id.edtPassword);
         roleRadioGroup = findViewById(R.id.roleRadioGroup);
         btnLogin = findViewById(R.id.btnLogin);
-        textViewRegister = findViewById(R.id.textViewRegister);
 
         userService = ApiUtils.getUserService();
 
