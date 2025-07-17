@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View; // Import View
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,7 +24,27 @@ public class AdminDashboardActivity extends AppCompatActivity {
         btnAddItem = findViewById(R.id.btnAddItem);
         btnUpdateItem = findViewById(R.id.btnUpdateItem);
 
-        // TODO: Add setOnClickListeners to navigate to other admin functions
+        // Set OnClickListener for View All Requests button
+        btnViewAllRequests.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(AdminDashboardActivity.this, ViewRequestsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // TODO: Add setOnClickListeners for other admin functions
+        // Example for btnComplete (assuming it leads to an activity for completing requests)
+        /*
+        btnComplete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(AdminDashboardActivity.this, CompleteRequestActivity.class);
+                startActivity(intent);
+            }
+        });
+        */
+        // And similarly for btnAddItem and btnUpdateItem
     }
 
     // Inflate the menu (with Logout option)

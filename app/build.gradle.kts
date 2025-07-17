@@ -40,6 +40,7 @@ dependencies {
     // ✅ Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation(libs.play.services.fitness)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
