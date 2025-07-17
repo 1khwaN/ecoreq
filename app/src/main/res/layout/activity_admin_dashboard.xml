@@ -7,9 +7,12 @@
     android:fitsSystemWindows="true"
     android:padding="24dp">
 
-
-        <!-- Header -->
-        <TextView
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            tools:context=".AdminDashboardActivity"> <TextView
             android:id="@+id/tvAdminTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -19,103 +22,97 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <!-- View Requests -->
-        <Button
-            android:id="@+id/btnViewAllRequests"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="View All Requests" />
+                <Button
+                    android:id="@+id/btnViewAllRequests"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="View All Requests" />
 
-        <!-- Update Request Section -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:text="Update Request Status"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="Update Request Status"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-        <!-- Select Request -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Select Request:"
-            android:textSize="16sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Request:"
+                    android:textSize="16sp" />
 
-        <Spinner
-            android:id="@+id/spinnerRequests"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
+                <Spinner
+                    android:id="@+id/spinnerRequests"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp" />
 
-        <!-- Enter Weight -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Enter Item Weight (kg):"
-            android:textSize="16sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Enter Item Weight (kg):"
+                    android:textSize="16sp" />
 
-        <EditText
-            android:id="@+id/edtWeight"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="e.g. 3.5"
-            android:inputType="numberDecimal" />
+                <EditText
+                    android:id="@+id/edtWeight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:hint="e.g. 3.5"
+                    android:inputType="numberDecimal" />
 
-        <!-- Calculated Price -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Total Price (RM):"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total Price (RM):"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/tvCalculatedPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="0.00"
-            android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/tvCalculatedPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="0.00"
+                    android:textSize="16sp" />
 
-        <Button
-            android:id="@+id/btnUpdateRequestStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:background="#9EEF74"
-            android:text="Update Status" />
+                <Button
+                    android:id="@+id/btnUpdateRequestStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    android:background="#9EEF74"
+                    android:text="Update Status" />
 
-        <!-- Recyclable Item Management -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:text="Manage Recyclable Items"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:text="Manage Recyclable Items"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/btnAddRecyclableItem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:text="Add New Recyclable Item" />
+                <Button
+                    android:id="@+id/btnAddRecyclableItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:text="Add New Recyclable Item" />
 
-        <Button
-            android:id="@+id/btnUpdateRecyclableItem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:text="Update Recyclable Item" />
+                <Button
+                    android:id="@+id/btnUpdateRecyclableItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    android:text="Update Recyclable Item" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewRequests"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:listitem="@layout/item_request" />
-
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewRequests"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:listitem="@layout/item_request"
+                    android:layout_marginTop="16dp" /> </LinearLayout>
 </ScrollView>
