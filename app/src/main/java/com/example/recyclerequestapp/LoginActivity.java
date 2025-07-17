@@ -2,8 +2,16 @@ package com.example.recyclerequestapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.*;
+import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.recyclerequestapp.model.User;
 import com.example.recyclerequestapp.remote.ApiUtils;
@@ -15,69 +23,80 @@ import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText edtUsername, edtPassword;
-    private RadioGroup roleRadioGroup;
-    private Button btnLogin;
-    private TextView textViewRegister;
-
-    private UserService userService;
+    private EditText edtUsername;
+    private EditText edtPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.login), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
-        // Link components
         edtUsername = findViewById(R.id.edtUsername);
         edtPassword = findViewById(R.id.edtPassword);
-        roleRadioGroup = findViewById(R.id.roleRadioGroup);
-        btnLogin = findViewById(R.id.btnLogin);
-
-        userService = ApiUtils.getUserService();
-
-        btnLogin.setOnClickListener(v -> loginClicked());
     }
 
-    private void loginClicked() {
-        String username = edtUsername.getText().toString().trim();
-        String password = edtPassword.getText().toString().trim();
+    public void loginClicked(View view) {
+        String username = edtUsername.getText().toString();
+        String password = edtPassword.getText().toString();
 
-        if (username.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
-            return;
+        if (validateLogin(username, password)) {
+            doLogin(username, password);
         }
+    }
 
-        int selectedId = roleRadioGroup.getCheckedRadioButtonId();
-        if (selectedId == -1) {
-            Toast.makeText(this, "Please select a role", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+    private void doLogin(String username, String password) {
+        UserService userService = ApiUtils.getUserService();
         Call<User> call = userService.login(username, password);
+
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
-                if (response.isSuccessful() && response.body() != null) {
+                if (response.isSuccessful()) {
                     User user = response.body();
+                    if (user != null && user.getToken() != null) {
+                        SharedPrefManager spm = new SharedPrefManager(getApplicationContext());
+                        spm.storeUser(user);
 
-                    if (selectedId == R.id.radioUser) {
-                        startActivity(new Intent(LoginActivity.this, UserDashboardActivity.class));
-                        Toast.makeText(LoginActivity.this, "Logged in as User", Toast.LENGTH_SHORT).show();
-                    } else if (selectedId == R.id.radioAdmin) {
-                        startActivity(new Intent(LoginActivity.this, AdminDashboardActivity.class));
-                        Toast.makeText(LoginActivity.this, "Logged in as Admin", Toast.LENGTH_SHORT).show();
+                        displayToast("Login successful");
+
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        displayToast("Login failed. Invalid credentials.");
                     }
-
-                    // Optionally: Save token using SharedPreferences here
                 } else {
-                    Toast.makeText(LoginActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
+                    displayToast("Login failed. Server error.");
                 }
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-                Toast.makeText(LoginActivity.this, "Failed to connect to server", Toast.LENGTH_SHORT).show();
+                displayToast("Error connecting to server.");
+                Log.e("LoginError", t.getMessage(), t);
             }
         });
+    }
+
+    private boolean validateLogin(String username, String password) {
+        if (username == null || username.trim().isEmpty()) {
+            displayToast("Username is required");
+            return false;
+        }
+        if (password == null || password.trim().isEmpty()) {
+            displayToast("Password is required");
+            return false;
+        }
+        return true;
+    }
+
+    public void displayToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }
