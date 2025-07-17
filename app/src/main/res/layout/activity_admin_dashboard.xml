@@ -1,120 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
     android:padding="24dp"
-    android:fitsSystemWindows="true">
+    tools:context=".AdminDashboardActivity">
 
-    <LinearLayout
+    <Button
+        android:id="@+id/btnViewAllRequests"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:text="View All Requests"
+        android:layout_marginBottom="16dp" />
 
-        <!-- Header -->
-        <TextView
-            android:id="@+id/tvAdminTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Admin Dashboard"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="24dp" />
+    <Button
+        android:id="@+id/btnUpdateRequestStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Update Request Status"
+        android:layout_marginBottom="16dp" />
 
-        <!-- View Requests -->
-        <Button
-            android:id="@+id/btnViewAllRequests"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="View All Requests"
-            android:layout_marginBottom="16dp" />
+    <Button
+        android:id="@+id/btnAddRecyclableItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Recyclable Item"
+        android:layout_marginBottom="16dp" />
 
-        <!-- Update Request Section -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Update Request Status"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
-
-        <!-- Select Request -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Select Request:"
-            android:textSize="16sp" />
-
-        <Spinner
-            android:id="@+id/spinnerRequests"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Enter Weight -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Enter Item Weight (kg):"
-            android:textSize="16sp" />
-
-        <EditText
-            android:id="@+id/edtWeight"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="e.g. 3.5"
-            android:inputType="numberDecimal"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Calculated Price -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Total Price (RM):"
-            android:textStyle="bold"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/tvCalculatedPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0.00"
-            android:textSize="16sp"
-            android:layout_marginBottom="16dp" />
-
-        <Button
-            android:id="@+id/btnComplete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Mark as Completed"
-            android:layout_marginBottom="24dp" />
-
-        <!-- Recyclable Item Management -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Manage Recyclable Items"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp" />
-
-        <Button
-            android:id="@+id/btnAddItem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Add New Recyclable Item"
-            android:layout_marginBottom="12dp" />
-
-        <Button
-            android:id="@+id/btnUpdateItem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Update Recyclable Item"
-            android:layout_marginBottom="24dp" />
+    <Button
+        android:id="@+id/btnUpdateRecyclableItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Update Recyclable Item"
+        android:layout_marginBottom="16dp" />
 
 
-
-    </LinearLayout>
-</ScrollView>
+</LinearLayout>

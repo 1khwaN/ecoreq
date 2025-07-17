@@ -31,6 +31,25 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
+
+        // ✅ Auto-login if user is already logged in
+        SharedPrefManager spm = new SharedPrefManager(getApplicationContext());
+        if (spm.isLoggedIn()) {
+            User user = spm.getUser();
+            String role = user.getRole();
+
+            Intent intent;
+            if ("admin".equalsIgnoreCase(role)) {
+                intent = new Intent(this, AdminDashboardActivity.class);
+            } else {
+                intent = new Intent(this, UserDashboardActivity.class);
+            }
+
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            return;
+        }
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.login), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -42,8 +61,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void loginClicked(View view) {
-        String username = edtUsername.getText().toString();
-        String password = edtPassword.getText().toString();
+        String username = edtUsername.getText().toString().trim();
+        String password = edtPassword.getText().toString().trim();
 
         if (validateLogin(username, password)) {
             doLogin(username, password);
@@ -59,20 +78,31 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful()) {
                     User user = response.body();
+
                     if (user != null && user.getToken() != null) {
+                        // Save user session
                         SharedPrefManager spm = new SharedPrefManager(getApplicationContext());
                         spm.storeUser(user);
 
                         displayToast("Login successful");
 
-                        Intent intent = new Intent(LoginActivity.this, UserDashboardActivity.class);
+                        // Redirect based on role
+                        String role = user.getRole();
+                        Intent intent;
+
+                        if ("admin".equalsIgnoreCase(role)) {
+                            intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
+                        } else {
+                            intent = new Intent(LoginActivity.this, UserDashboardActivity.class);
+                        }
+
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
-                        finish();
                     } else {
-                        displayToast("Login failed. Invalid credentials.");
+                        displayToast("Login failed: invalid user or token.");
                     }
                 } else {
-                    displayToast("Login failed. Server error.");
+                    displayToast("Login failed: check your credentials.");
                 }
             }
 
@@ -85,18 +115,18 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean validateLogin(String username, String password) {
-        if (username == null || username.trim().isEmpty()) {
-            displayToast("Username is required");
+        if (username.isEmpty()) {
+            displayToast("Username is required.");
             return false;
         }
-        if (password == null || password.trim().isEmpty()) {
-            displayToast("Password is required");
+        if (password.isEmpty()) {
+            displayToast("Password is required.");
             return false;
         }
         return true;
     }
 
-    public void displayToast(String message) {
+    private void displayToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }

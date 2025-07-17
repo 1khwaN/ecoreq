@@ -14,18 +14,13 @@
         android:theme="@style/Theme.RecycleRequestApp"
         tools:targetApi="31"
         android:usesCleartextTraffic="true">
-        <activity
-            android:name=".MainActivity"
+        <activity android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".LoginActivity"
-            />
 
         <activity android:name=".CancelRequestActivity" />
         <activity android:name=".ViewRequestsActivity" />

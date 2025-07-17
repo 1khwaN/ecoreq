@@ -3,7 +3,7 @@ package com.example.recyclerequestapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem; // ← Add this import
+import android.view.MenuItem;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,18 +35,22 @@ public class UserDashboardActivity extends AppCompatActivity {
         });
     }
 
-    // 👇 Add this to show the 3-dots menu
+    // Show 3-dot menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.user_menu, menu); // loads res/menu/user_menu.xml
+        getMenuInflater().inflate(R.menu.user_menu, menu);
         return true;
     }
 
-    // 👇 Add this to handle menu click
+    // Handle logout
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_logout) {
-            // Logout logic
+            // ✅ Clear session
+            SharedPrefManager spm = new SharedPrefManager(getApplicationContext());
+            spm.logout();
+
+            // Redirect to login
             Intent intent = new Intent(UserDashboardActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

@@ -5,42 +5,70 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 public class AdminDashboardActivity extends AppCompatActivity {
 
     // Declare buttons
-    Button btnViewAllRequests, btnComplete, btnAddItem, btnUpdateItem;
+    Button btnViewAllRequests, btnUpdateRequestStatus, btnAddRecyclableItem, btnUpdateRecyclableItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_dashboard);
 
-        // Link buttons to layout (you must have these IDs in the XML)
+        // Link buttons with layout
         btnViewAllRequests = findViewById(R.id.btnViewAllRequests);
-        btnComplete = findViewById(R.id.btnComplete);
-        btnAddItem = findViewById(R.id.btnAddItem);
-        btnUpdateItem = findViewById(R.id.btnUpdateItem);
+        btnUpdateRequestStatus = findViewById(R.id.btnUpdateRequestStatus);
+        btnAddRecyclableItem = findViewById(R.id.btnAddRecyclableItem);
+        btnUpdateRecyclableItem = findViewById(R.id.btnUpdateRecyclableItem);
 
-        // TODO: Add setOnClickListeners to navigate to other admin functions
+        // Button: View All Requests
+        btnViewAllRequests.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, ViewRequestsActivity.class);
+            startActivity(intent);
+        });
+
+        // Button: Update Request Status
+        btnUpdateRequestStatus.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, UpdateRequestStatusActivity.class);
+            startActivity(intent);
+        });
+
+        // Button: Add New Recyclable Item
+        btnAddRecyclableItem.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, AddRecyclableItemActivity.class);
+            startActivity(intent);
+        });
+
+        // Button: Update Recyclable Item
+        btnUpdateRecyclableItem.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, UpdateRecyclableItemActivity.class);
+            startActivity(intent);
+        });
     }
 
-    // Inflate the menu (with Logout option)
+    // Show 3-dot menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.user_menu, menu); // reuse user_menu
+        getMenuInflater().inflate(R.menu.admin_menu, menu); // Load res/menu/admin_menu.xml
         return true;
     }
 
-    // Handle menu item clicks
+    // Handle menu actions (like logout)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_logout) {
-            Intent intent = new Intent(this, LoginActivity.class);
+            // Clear session
+            SharedPrefManager spm = new SharedPrefManager(getApplicationContext());
+            spm.logout();
+
+            // Redirect to login
+            Intent intent = new Intent(AdminDashboardActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            finish(); // End current activity
+            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
