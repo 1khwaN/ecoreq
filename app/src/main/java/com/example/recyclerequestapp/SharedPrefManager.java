@@ -2,57 +2,60 @@ package com.example.recyclerequestapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
 import com.example.recyclerequestapp.model.User;
 
 public class SharedPrefManager {
+    private static final String PREF_NAME = "recyclesharedpref";
+    private static final String KEY_ID = "keyid",
+            KEY_USERNAME = "keyusername",
+            KEY_EMAIL = "keyemail",
+            KEY_TOKEN = "keytoken",
+            KEY_ROLE = "keyrole";
 
-    private static final String SHARED_PREF_NAME = "recyclesharedpref";
-    private static final String KEY_ID = "keyid";
-    private static final String KEY_USERNAME = "keyusername";
-    private static final String KEY_EMAIL = "keyemail";
-    private static final String KEY_TOKEN = "keytoken";
-    private static final String KEY_ROLE = "keyrole";
+    private static SharedPrefManager mInstance;
+    private static Context mCtx;
 
-    private final Context mCtx;
+    private SharedPrefManager(Context context) {
+        mCtx = context.getApplicationContext();
+    }
 
-    public SharedPrefManager(Context context) {
-        mCtx = context;
+    public static synchronized SharedPrefManager getInstance(Context context) {
+        if (mInstance == null) {
+            mInstance = new SharedPrefManager(context);
+        }
+        return mInstance;
     }
 
     public void storeUser(User user) {
-        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(KEY_ID, user.getId());
-        editor.putString(KEY_USERNAME, user.getUsername());
-        editor.putString(KEY_EMAIL, user.getEmail());
-        editor.putString(KEY_TOKEN, user.getToken());
-        editor.putString(KEY_ROLE, user.getRole());
-        editor.apply();
-    }
-
-    public boolean isLoggedIn() {
-        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
-        return sharedPreferences.getString(KEY_USERNAME, null) != null;
+        SharedPreferences prefs = mCtx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor e = prefs.edit();
+        e.putInt(KEY_ID, user.getId());
+        e.putString(KEY_USERNAME, user.getUsername());
+        e.putString(KEY_EMAIL, user.getEmail());
+        e.putString(KEY_TOKEN, user.getToken());
+        e.putString(KEY_ROLE, user.getRole());
+        e.apply();
     }
 
     public User getUser() {
-        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
-
-        User user = new User();
-        user.setId(sharedPreferences.getInt(KEY_ID, -1));
-        user.setUsername(sharedPreferences.getString(KEY_USERNAME, null));
-        user.setEmail(sharedPreferences.getString(KEY_EMAIL, null));
-        user.setToken(sharedPreferences.getString(KEY_TOKEN, null));
-        user.setRole(sharedPreferences.getString(KEY_ROLE, null));
-
-        return user;
+        SharedPreferences p = mCtx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        User u = new User();
+        u.setId(p.getInt(KEY_ID, -1));
+        u.setUsername(p.getString(KEY_USERNAME, null));
+        u.setEmail(p.getString(KEY_EMAIL, null));
+        u.setToken(p.getString(KEY_TOKEN, null));
+        u.setRole(p.getString(KEY_ROLE, null));
+        return u;
     }
 
     public void logout() {
-        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
+        SharedPreferences.Editor e = mCtx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).edit();
+        e.clear().apply();
     }
+
+    public boolean isLoggedIn() {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(KEY_USERNAME, null) != null;
+    }
+
 }

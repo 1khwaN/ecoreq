@@ -1,85 +1,57 @@
 package com.example.recyclerequestapp.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Request {
-    private int requestId;
+
+    @SerializedName("user_id")
     private int userId;
+
+    @SerializedName("item_id")
     private int itemId;
+
+    @SerializedName("address")
     private String address;
-    private String requestDate; // Or use a Date object and handle parsing
+
+    @SerializedName("request_date")
+    private String requestDate;
+
+    @SerializedName("status")
     private String status;
-    private Double weight; // Use Double for nullable decimals
-    private Double totalPrice; // Use Double for nullable decimals
+
+    @SerializedName("weight")
+    private double weight;
+
+    @SerializedName("total_price")
+    private double totalPrice;
+
+    @SerializedName("notes")
     private String notes;
 
-    public int getRequestId() {
-        return requestId;
-    }
-
-    public void setRequestId(int requestId) {
-        this.requestId = requestId;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
+    public Request(int userId, int itemId, String address, String requestDate,
+                   String status, double weight, double totalPrice, String notes) {
         this.userId = userId;
-    }
-
-    public int getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(int itemId) {
         this.itemId = itemId;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
         this.address = address;
-    }
-
-    public String getRequestDate() {
-        return requestDate;
-    }
-
-    public void setRequestDate(String requestDate) {
         this.requestDate = requestDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
         this.status = status;
-    }
-
-    public Double getWeight() {
-        return weight;
-    }
-
-    public void setWeight(Double weight) {
         this.weight = weight;
-    }
-
-    public Double getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    // Optional: helpful for debugging
+    @Override
+    public String toString() {
+        return "Request{" +
+                "userId=" + userId +
+                ", itemId=" + itemId +
+                ", address='" + address + '\'' +
+                ", requestDate='" + requestDate + '\'' +
+                ", status='" + status + '\'' +
+                ", weight=" + weight +
+                ", totalPrice=" + totalPrice +
+                ", notes='" + notes + '\'' +
+                '}';
     }
 }
