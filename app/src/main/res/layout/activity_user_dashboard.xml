@@ -52,6 +52,22 @@
             android:inputType="textPostalAddress"
             android:layout_marginBottom="16dp" />
 
+        <!-- Date Picker -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Date:"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/edtDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tap to pick date"
+            android:focusable="false"
+            android:clickable="true"
+            android:layout_marginBottom="16dp" />
+
         <!-- Notes -->
         <TextView
             android:layout_width="wrap_content"

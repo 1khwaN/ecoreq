@@ -25,10 +25,10 @@ public class Request implements Serializable {
     private String status;
 
     @SerializedName("weight")
-    private Double weight;
+    private double weight;
 
     @SerializedName("total_price")
-    private Double totalPrice;
+    private double totalPrice;
 
     @SerializedName("notes")
     private String notes;
@@ -86,3 +86,20 @@ public class Request implements Serializable {
     public String getDisplayTotalPrice() { return (totalPrice != null) ? String.format("RM %.2f", totalPrice) : "N/A"; }
     public String getDisplayNotes() { return (notes != null && !notes.isEmpty()) ? notes : "None"; }
 }
+    
+
+    // Optional: helpful for debugging
+    @Override
+    public String toString() {
+        return "Request{" +
+                "userId=" + userId +
+                ", itemId=" + itemId +
+                ", address='" + address + '\'' +
+                ", requestDate='" + requestDate + '\'' +
+                ", status='" + status + '\'' +
+                ", weight=" + weight +
+                ", totalPrice=" + totalPrice +
+                ", notes='" + notes + '\'' +
+                '}';
+    }
+

@@ -6,8 +6,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+import com.example.recyclerequestapp.SharedPrefManager;
 
-import androidx.activity.EdgeToEdge;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -29,11 +30,20 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
 
-        // ✅ Auto-login if user is already logged in
-        SharedPrefManager spm = new SharedPrefManager(getApplicationContext());
+        // Handle window insets for immersive layout (optional)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.login), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        edtUsername = findViewById(R.id.edtUsername);
+        edtPassword = findViewById(R.id.edtPassword);
+
+        // Check if user is already logged in
+        SharedPrefManager spm = SharedPrefManager.getInstance(this);
         if (spm.isLoggedIn()) {
             User user = spm.getUser();
             String role = user.getRole();
@@ -47,17 +57,8 @@ public class LoginActivity extends AppCompatActivity {
 
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            return;
+            finish(); // Optional to prevent back navigation
         }
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.login), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-        edtUsername = findViewById(R.id.edtUsername);
-        edtPassword = findViewById(R.id.edtPassword);
     }
 
     public void loginClicked(View view) {
@@ -71,26 +72,22 @@ public class LoginActivity extends AppCompatActivity {
 
     private void doLogin(String username, String password) {
         UserService userService = ApiUtils.getUserService();
-        Call<User> call = userService.login(username, password);
 
+        Call<User> call = userService.login(username, password);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     User user = response.body();
 
-                    if (user != null && user.getToken() != null) {
-                        // Save user session
-                        SharedPrefManager spm = new SharedPrefManager(getApplicationContext());
+                    if (user.getToken() != null) {
+                        SharedPrefManager spm = SharedPrefManager.getInstance(LoginActivity.this);
                         spm.storeUser(user);
 
                         displayToast("Login successful");
 
-                        // Redirect based on role
-                        String role = user.getRole();
                         Intent intent;
-
-                        if ("admin".equalsIgnoreCase(role)) {
+                        if ("admin".equalsIgnoreCase(user.getRole())) {
                             intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
                         } else {
                             intent = new Intent(LoginActivity.this, UserDashboardActivity.class);
@@ -99,10 +96,10 @@ public class LoginActivity extends AppCompatActivity {
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                     } else {
-                        displayToast("Login failed: invalid user or token.");
+                        displayToast("Login failed: Token missing.");
                     }
                 } else {
-                    displayToast("Login failed: check your credentials.");
+                    displayToast("Login failed: Invalid credentials.");
                 }
             }
 
