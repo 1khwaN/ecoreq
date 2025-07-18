@@ -1,19 +1,31 @@
 package com.example.recyclerequestapp.remote;
 
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
+    public static Retrofit getClient(String baseUrl, String token) {
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
-    private static Retrofit retrofit = null;
-
-    public static Retrofit getClient(String baseUrl) {
-        if (retrofit == null) {
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(baseUrl)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
+        if (token != null && !token.isEmpty()) {
+            httpClient.addInterceptor(chain -> {
+                Request original = chain.request();
+                Request.Builder builder = original.newBuilder()
+                        .header("Authorization", "Bearer " + token) // 👈 this must be correct
+                        .method(original.method(), original.body());
+                return chain.proceed(builder.build());
+            });
         }
-        return retrofit;
+
+        return new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .client(httpClient.build())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
     }
 }
+
+

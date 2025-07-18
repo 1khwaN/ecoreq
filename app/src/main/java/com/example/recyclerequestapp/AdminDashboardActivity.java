@@ -61,7 +61,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_logout) {
             // Clear session
-            SharedPrefManager spm = new SharedPrefManager(getApplicationContext());
+            SharedPrefManager spm = SharedPrefManager.getInstance(getApplicationContext());
             spm.logout();
 
             // Redirect to login
