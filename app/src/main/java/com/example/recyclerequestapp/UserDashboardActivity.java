@@ -15,6 +15,7 @@ import com.example.recyclerequestapp.model.Request;
 import com.example.recyclerequestapp.remote.ApiUtils;
 import com.example.recyclerequestapp.remote.RequestService;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import retrofit2.Call;
@@ -37,11 +38,7 @@ public class UserDashboardActivity extends AppCompatActivity {
 
         // Get user token
         token = SharedPrefManager.getInstance(this).getUser().getToken();
-        requestService = ApiUtils.getRequestService(token); // ✅ now passes token properly
-
-        // Initialize API service with token
-        requestService.getItems("Bearer " + token);
-
+        requestService = ApiUtils.getRequestService(token);
 
         // Bind UI
         spinnerItemType = findViewById(R.id.spinnerItemType);
@@ -111,16 +108,29 @@ public class UserDashboardActivity extends AppCompatActivity {
 
         Item selectedItem = itemList.get(pos);
         String address = edtAddress.getText().toString().trim();
-        String date = edtDate.getText().toString().trim();
+        String dateInput = edtDate.getText().toString().trim();
         String notes = edtNotes.getText().toString().trim();
 
-        if (address.isEmpty() || date.isEmpty()) {
+        if (address.isEmpty() || dateInput.isEmpty()) {
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // Convert to correct date format
+        String formattedDate;
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            formattedDate = outputFormat.format(inputFormat.parse(dateInput));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Invalid date format", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         int userId = SharedPrefManager.getInstance(this).getUser().getId();
-        Request request = new Request(userId, selectedItem.getItemId(), address, date, "Pending", 0, 0, notes);
+
+        Request request = new Request(userId, selectedItem.getItemId(), address, formattedDate, "Pending", 0, 0, notes);
 
         requestService.submitRequest(request).enqueue(new Callback<Void>() {
             @Override
@@ -130,12 +140,14 @@ public class UserDashboardActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(UserDashboardActivity.this,
                             "Failed to submit: " + response.code(), Toast.LENGTH_LONG).show();
+                    Log.e("SUBMIT_REQUEST", "Code: " + response.code() + " Msg: " + response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 Toast.makeText(UserDashboardActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("SUBMIT_REQUEST", "Error", t);
             }
         });
     }
