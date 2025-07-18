@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="request_statuses">
+        <item>Pending</item>
+        <item>Accepted</item>
+        <item>Rejected</item>
+        <item>Completed</item>
+        <item>Cancelled</item>
+    </string-array>
+</resources>

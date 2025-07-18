@@ -6,21 +6,24 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.recyclerequestapp.R; // Make sure this points to your R file
+import com.example.recyclerequestapp.R;
 import com.example.recyclerequestapp.model.Request;
 import java.util.List;
 
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
 
     private List<Request> requestList;
+    private OnItemClickListener listener;
 
-    public RequestAdapter(List<Request> requestList) {
-        this.requestList = requestList;
+    // Interface for item click events
+    public interface OnItemClickListener {
+        void onItemClick(Request request);
     }
 
-    public void setRequestList(List<Request> requestList) {
+    // Constructor with listener
+    public RequestAdapter(List<Request> requestList, OnItemClickListener listener) {
         this.requestList = requestList;
-        notifyDataSetChanged(); // Notify the adapter that the data has changed
+        this.listener = listener;
     }
 
     @NonNull
@@ -33,15 +36,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     @Override
     public void onBindViewHolder(@NonNull RequestViewHolder holder, int position) {
         Request request = requestList.get(position);
-        holder.requestIdTextView.setText("Request ID: " + request.getRequestId());
-        holder.userIdTextView.setText("User ID: " + request.getUserId());
-        holder.itemIdTextView.setText("Item ID: " + request.getItemId()); // You might want to display item name instead
-        holder.addressTextView.setText("Address: " + request.getAddress());
-        holder.requestDateTextView.setText("Date: " + request.getRequestDate());
-        holder.statusTextView.setText("Status: " + request.getStatus());
-        holder.weightTextView.setText("Weight: " + (request.getWeight() != null ? request.getWeight() + " kg" : "N/A"));
-        holder.totalPriceTextView.setText("Total Price: RM " + (request.getTotalPrice() != null ? String.format("%.2f", request.getTotalPrice()) : "N/A"));
-        holder.notesTextView.setText("Notes: " + (request.getNotes() != null && !request.getNotes().isEmpty() ? request.getNotes() : "None"));
+        holder.bind(request, listener); // Pass request and listener to ViewHolder's bind method
     }
 
     @Override
@@ -49,28 +44,59 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         return requestList.size();
     }
 
+    public void setRequestList(List<Request> newRequestList) {
+        this.requestList.clear();
+        this.requestList.addAll(newRequestList);
+        notifyDataSetChanged();
+    }
+
     public static class RequestViewHolder extends RecyclerView.ViewHolder {
-        TextView requestIdTextView;
-        TextView userIdTextView;
-        TextView itemIdTextView;
-        TextView addressTextView;
-        TextView requestDateTextView;
-        TextView statusTextView;
-        TextView weightTextView;
-        TextView totalPriceTextView;
-        TextView notesTextView;
+        // Declare your TextViews as they are named in item_request.xml based on your screenshots
+        TextView text_request_id;
+        TextView text_user_id; // This will now display username
+        TextView text_item_id; // This will now display item name
+        TextView text_address;
+        TextView text_request_date;
+        TextView text_status;
+        TextView text_weight;
+        TextView text_total_price;
+        TextView text_notes;
 
         public RequestViewHolder(@NonNull View itemView) {
             super(itemView);
-            requestIdTextView = itemView.findViewById(R.id.text_request_id);
-            userIdTextView = itemView.findViewById(R.id.text_user_id);
-            itemIdTextView = itemView.findViewById(R.id.text_item_id);
-            addressTextView = itemView.findViewById(R.id.text_address);
-            requestDateTextView = itemView.findViewById(R.id.text_request_date);
-            statusTextView = itemView.findViewById(R.id.text_status);
-            weightTextView = itemView.findViewById(R.id.text_weight);
-            totalPriceTextView = itemView.findViewById(R.id.text_total_price);
-            notesTextView = itemView.findViewById(R.id.text_notes);
+            // Link your views from item_request.xml
+            text_request_id = itemView.findViewById(R.id.text_request_id);
+            text_user_id = itemView.findViewById(R.id.text_user_id);
+            text_item_id = itemView.findViewById(R.id.text_item_id);
+            text_address = itemView.findViewById(R.id.text_address);
+            text_request_date = itemView.findViewById(R.id.text_request_date);
+            text_status = itemView.findViewById(R.id.text_status);
+            text_weight = itemView.findViewById(R.id.text_weight);
+            text_total_price = itemView.findViewById(R.id.text_total_price);
+            text_notes = itemView.findViewById(R.id.text_notes);
+        }
+
+        public void bind(final Request request, final OnItemClickListener listener) {
+            // Populate your views with data from the Request object
+            text_request_id.setText("Request ID: " + request.getRequestId());
+
+            // Use username and item name from the (now enriched) Request model
+            text_user_id.setText("User: " + (request.getUsername() != null ? request.getUsername() : "ID: " + request.getUserId()));
+            text_item_id.setText("Item: " + (request.getItemName() != null ? request.getItemName() : "ID: " + request.getItemId()));
+
+            text_address.setText("Address: " + request.getAddress());
+            text_request_date.setText("Date: " + request.getRequestDate());
+            text_status.setText("Status: " + request.getStatus());
+            text_weight.setText("Weight: " + request.getDisplayWeight());
+            text_total_price.setText("Total Price: " + request.getDisplayTotalPrice());
+            text_notes.setText("Notes: " + request.getDisplayNotes());
+
+            // Set the click listener on the item view
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onItemClick(request);
+                }
+            });
         }
     }
 }
