@@ -12,6 +12,7 @@ import retrofit2.http.PATCH;
 import retrofit2.http.Path;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public interface RequestService {
 
@@ -35,5 +36,15 @@ public interface RequestService {
 
 
     @POST("requests")
-    Call<Void> submitRequest(@Body Request request);
+    Call<Void> submitRequest(
+            @Header("Authorization") String token,
+            @Body Request request
+    );
+
+    // Get all requests by user ID (requires Authorization)
+    @GET("requests")
+    Call<List<Request>> getMyRequests(
+            @Header("Authorization") String token
+    );
+
 }

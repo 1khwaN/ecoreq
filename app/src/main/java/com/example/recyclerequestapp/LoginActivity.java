@@ -1,20 +1,15 @@
 package com.example.recyclerequestapp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import com.example.recyclerequestapp.SharedPrefManager;
-
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.example.recyclerequestapp.model.User;
+import com.example.recyclerequestapp.model.LoginResponse;
 import com.example.recyclerequestapp.remote.ApiUtils;
 import com.example.recyclerequestapp.remote.UserService;
 
@@ -24,106 +19,64 @@ import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText edtUsername;
-    private EditText edtPassword;
+    private EditText etUsername, etPassword;
+    private Button btnLogin;
+    private UserService userService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Handle window insets for immersive layout (optional)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.login), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-        edtUsername = findViewById(R.id.edtUsername);
-        edtPassword = findViewById(R.id.edtPassword);
-
-        // Check if user is already logged in
-        SharedPrefManager spm = SharedPrefManager.getInstance(this);
-        if (spm.isLoggedIn()) {
-            User user = spm.getUser();
-            String role = user.getRole();
-
-            Intent intent;
-            if ("admin".equalsIgnoreCase(role)) {
-                intent = new Intent(this, AdminDashboardActivity.class);
-            } else {
-                intent = new Intent(this, UserDashboardActivity.class);
-            }
-
+        // 🔒 Auto-login check
+        if (SharedPrefManager.getInstance(this).isLoggedIn()) {
+            // Redirect to dashboard if user is already logged in
+            Intent intent = new Intent(LoginActivity.this, UserDashboardActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            finish(); // Optional to prevent back navigation
+            return;
         }
-    }
+        etUsername = findViewById(R.id.edtUsername);
+        etPassword = findViewById(R.id.edtPassword);
+        btnLogin = findViewById(R.id.btnLogin);
 
-    public void loginClicked(View view) {
-        String username = edtUsername.getText().toString().trim();
-        String password = edtPassword.getText().toString().trim();
+        userService = ApiUtils.getUserService();
 
-        if (validateLogin(username, password)) {
-            doLogin(username, password);
-        }
-    }
+        btnLogin.setOnClickListener(v -> {
+            String usernameOrEmail = etUsername.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
 
-    private void doLogin(String username, String password) {
-        UserService userService = ApiUtils.getUserService();
+            if (usernameOrEmail.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please enter username/email and password", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-        Call<User> call = userService.login(username, password);
-        call.enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    User user = response.body();
+            userService.login(usernameOrEmail, password).enqueue(new Callback<LoginResponse>() {
+                @Override
+                public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        String token = response.body().getToken();
+                        int userId = response.body().getUserId();
 
-                    if (user.getToken() != null) {
-                        SharedPrefManager spm = SharedPrefManager.getInstance(LoginActivity.this);
-                        spm.storeUser(user);
+                        SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("token", token);
+                        editor.putInt("user_id", userId);
+                        editor.apply();
 
-                        displayToast("Login successful");
-
-                        Intent intent;
-                        if ("admin".equalsIgnoreCase(user.getRole())) {
-                            intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
-                        } else {
-                            intent = new Intent(LoginActivity.this, UserDashboardActivity.class);
-                        }
-
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
+                        Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(LoginActivity.this, UserDashboardActivity.class));
+                        finish();
                     } else {
-                        displayToast("Login failed: Token missing.");
+                        Toast.makeText(LoginActivity.this, "Login failed: Invalid credentials", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    displayToast("Login failed: Invalid credentials.");
                 }
-            }
 
-            @Override
-            public void onFailure(Call<User> call, Throwable t) {
-                displayToast("Error connecting to server.");
-                Log.e("LoginError", t.getMessage(), t);
-            }
+                @Override
+                public void onFailure(Call<LoginResponse> call, Throwable t) {
+                    Toast.makeText(LoginActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
-    }
-
-    private boolean validateLogin(String username, String password) {
-        if (username.isEmpty()) {
-            displayToast("Username is required.");
-            return false;
-        }
-        if (password.isEmpty()) {
-            displayToast("Password is required.");
-            return false;
-        }
-        return true;
-    }
-
-    private void displayToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }

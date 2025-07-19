@@ -1,5 +1,7 @@
 package com.example.recyclerequestapp.adapter;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,9 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.recyclerequestapp.R;
-import com.example.recyclerequestapp.model.Request;
+import com.example.recyclerequestapp.RequestDetailActivity;
 import java.util.List;
-
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
 
     private List<Request> requestList;
@@ -24,12 +25,18 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     public RequestAdapter(List<Request> requestList, OnItemClickListener listener) {
         this.requestList = requestList;
         this.listener = listener;
+    private Context context;
+
+    // ✅ FIX: Add context as parameter and assign it correctly
+    public RequestAdapter(Context context, List<Request> requestList) {
+        this.context = context;
+        this.requestList = requestList;
     }
 
     @NonNull
     @Override
     public RequestViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_request, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.request_item, parent, false);
         return new RequestViewHolder(view);
     }
 
@@ -37,6 +44,20 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     public void onBindViewHolder(@NonNull RequestViewHolder holder, int position) {
         Request request = requestList.get(position);
         holder.bind(request, listener); // Pass request and listener to ViewHolder's bind method
+
+        holder.tvDate.setText(request.getRequestDate());
+        holder.tvStatus.setText(request.getStatus());
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, RequestDetailActivity.class);
+            intent.putExtra("date", request.getRequestDate());
+            intent.putExtra("status", request.getStatus());
+            intent.putExtra("totalPrice", request.getTotalPrice());
+            intent.putExtra("address", request.getAddress());
+            intent.putExtra("notes", request.getNotes());
+            intent.putExtra("weight", request.getWeight());
+            context.startActivity(intent);
+        });
     }
 
     @Override
@@ -97,6 +118,16 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
                     listener.onItemClick(request);
                 }
             });
+        }
+    }
+}
+    public static class RequestViewHolder extends RecyclerView.ViewHolder {
+        TextView tvDate, tvStatus;
+
+        public RequestViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvDate = itemView.findViewById(R.id.tvDate);
+            tvStatus = itemView.findViewById(R.id.tvStatus);
         }
     }
 }

@@ -80,18 +80,57 @@ public class Request implements Serializable {
         this.username = null;
         this.itemName = null;
         this.pricePerKg = null;
+                   }
+    // Getter methods
+    public int getUserId() {
+        return userId;
+    }
+
+    public int getItemId() {
+        return itemId;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getRequestDate() {
+        return requestDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    // Optional: helpful for debugging
+    @Override
+    public String toString() {
+        return "Request{" +
+                "userId=" + userId +
+                ", itemId=" + itemId +
+                ", address='" + address + '\'' +
+                ", requestDate='" + requestDate + '\'' +
+                ", status='" + status + '\'' +
+                ", weight=" + weight +
+                ", totalPrice=" + totalPrice +
+                ", notes='" + notes + '\'' +
+                '}';
     }
 
     // Getters
     public int getRequestId() { return requestId; }
-    public int getUserId() { return userId; }
-    public int getItemId() { return itemId; }
-    public String getAddress() { return address; }
-    public String getRequestDate() { return requestDate; }
-    public String getStatus() { return status; }
-    public Double getWeight() { return weight; }
-    public Double getTotalPrice() { return totalPrice; }
-    public String getNotes() { return notes; }
     public String getUsername() { return username; } // Re-added
     public String getItemName() { return itemName; } // Re-added
     public Double getPricePerKg() { return pricePerKg; } // Re-added

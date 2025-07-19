@@ -105,35 +105,5 @@
             android:text="Cancel Request"
             android:layout_marginBottom="12dp" />
 
-        <!-- Status & Price Section -->
-        <TextView
-            android:id="@+id/tvTotalPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0.00" />
-
-        <TextView
-            android:id="@+id/tvStatusLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Request Status:"
-            android:textStyle="bold"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/tvStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Pending"
-            android:layout_marginBottom="16dp" />
-
-        <TextView
-            android:id="@+id/tvTotalLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Total Price (RM):"
-            android:textStyle="bold"
-            android:textSize="16sp" />
-
     </LinearLayout>
 </ScrollView>

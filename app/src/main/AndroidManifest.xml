@@ -36,7 +36,10 @@
             android:name=".AdminDashboardActivity"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
         <activity
-            android:name=".UserDashboardActivity"
+            android:name=".UserDashboardActivity"/>
+        <activity android:name=".RequestDetailActivity" />
+        <activity android:name=".ViewRequestsActivity" />
+        <activity android:name=".AdminDashboardActivity"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
     </application>
 
