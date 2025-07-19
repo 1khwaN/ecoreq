@@ -40,6 +40,39 @@ public class Request {
         this.notes = notes;
     }
 
+    // Getter methods
+    public int getUserId() {
+        return userId;
+    }
+
+    public int getItemId() {
+        return itemId;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getRequestDate() {
+        return requestDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
     // Optional: helpful for debugging
     @Override
     public String toString() {

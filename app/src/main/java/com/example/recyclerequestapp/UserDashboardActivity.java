@@ -30,17 +30,17 @@ public class UserDashboardActivity extends AppCompatActivity {
     private List<Item> itemList = new ArrayList<>();
     private RequestService requestService;
     private String token;
+    private int userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_dashboard);
 
-        // Get user token
         token = SharedPrefManager.getInstance(this).getUser().getToken();
+        userId = SharedPrefManager.getInstance(this).getUser().getId();
         requestService = ApiUtils.getRequestService(token);
 
-        // Bind UI
         spinnerItemType = findViewById(R.id.spinnerItemType);
         edtAddress = findViewById(R.id.edtAddress);
         edtDate = findViewById(R.id.edtDate);
@@ -49,10 +49,8 @@ public class UserDashboardActivity extends AppCompatActivity {
         btnViewRequests = findViewById(R.id.btnViewRequests);
         btnCancelRequest = findViewById(R.id.btnCancelRequest);
 
-        // Load dropdown items from API
         loadItemsFromDatabase();
 
-        // Date picker
         edtDate.setOnClickListener(v -> new DatePickerDialog(this,
                 (view, year, month, dayOfMonth) -> edtDate.setText(dayOfMonth + "/" + (month + 1) + "/" + year),
                 Calendar.getInstance().get(Calendar.YEAR),
@@ -60,7 +58,6 @@ public class UserDashboardActivity extends AppCompatActivity {
                 Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
         ).show());
 
-        // Button actions
         btnSubmitRequest.setOnClickListener(v -> submitRequest());
         btnViewRequests.setOnClickListener(v -> startActivity(new Intent(this, ViewRequestsActivity.class)));
         btnCancelRequest.setOnClickListener(v -> startActivity(new Intent(this, CancelRequestActivity.class)));
@@ -82,19 +79,16 @@ public class UserDashboardActivity extends AppCompatActivity {
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spinnerItemType.setAdapter(adapter);
 
-                    Log.d("ITEM_LIST", "Items loaded: " + names);
                 } else {
                     Toast.makeText(UserDashboardActivity.this,
-                            "Failed to load items: " + response.code(), Toast.LENGTH_LONG).show();
+                            "Failed to load items", Toast.LENGTH_LONG).show();
                     Log.e("LOAD_ITEMS", "Code=" + response.code() + " Msg=" + response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<List<Item>> call, Throwable t) {
-                Toast.makeText(UserDashboardActivity.this,
-                        "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("LOAD_ITEMS", "Error", t);
+                Toast.makeText(UserDashboardActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -116,38 +110,31 @@ public class UserDashboardActivity extends AppCompatActivity {
             return;
         }
 
-        // Convert to correct date format
         String formattedDate;
         try {
             SimpleDateFormat inputFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             formattedDate = outputFormat.format(inputFormat.parse(dateInput));
         } catch (Exception e) {
-            e.printStackTrace();
             Toast.makeText(this, "Invalid date format", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        int userId = SharedPrefManager.getInstance(this).getUser().getId();
-
         Request request = new Request(userId, selectedItem.getItemId(), address, formattedDate, "Pending", 0, 0, notes);
 
-        requestService.submitRequest(request).enqueue(new Callback<Void>() {
+        requestService.submitRequest("Bearer " + token, request).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(UserDashboardActivity.this, "Request submitted!", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(UserDashboardActivity.this,
-                            "Failed to submit: " + response.code(), Toast.LENGTH_LONG).show();
-                    Log.e("SUBMIT_REQUEST", "Code: " + response.code() + " Msg: " + response.message());
+                    Toast.makeText(UserDashboardActivity.this, "Submit failed", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(UserDashboardActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("SUBMIT_REQUEST", "Error", t);
+                Toast.makeText(UserDashboardActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -164,7 +151,6 @@ public class UserDashboardActivity extends AppCompatActivity {
             SharedPrefManager.getInstance(this).logout();
             startActivity(new Intent(this, LoginActivity.class)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
-            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
