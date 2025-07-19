@@ -11,7 +11,7 @@ import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.recyclerequestapp.model.Item;
-import com.example.recyclerequestapp.model.Request;
+import com.example.recyclerequestapp.model.Request; // Make sure this imports the correct Request model
 import com.example.recyclerequestapp.remote.ApiUtils;
 import com.example.recyclerequestapp.remote.RequestService;
 
@@ -67,11 +67,12 @@ public class UserDashboardActivity extends AppCompatActivity {
 
         // Button actions
         btnSubmitRequest.setOnClickListener(v -> submitRequest());
-        btnViewRequests.setOnClickListener(v -> startActivity(new Intent(this, ViewRequestsActivity.class)));
         btnCancelRequest.setOnClickListener(v -> startActivity(new Intent(this, CancelRequestActivity.class)));
     }
 
     private void loadItemsFromDatabase() {
+        // Assuming getItems is part of your RequestService, or you have another service for items
+        // If items are fetched via a different service, adjust ApiUtils.getRequestService(token).getItems
         requestService.getItems("Bearer " + token).enqueue(new Callback<List<Item>>() {
             @Override
             public void onResponse(Call<List<Item>> call, Response<List<Item>> response) {
@@ -135,17 +136,31 @@ public class UserDashboardActivity extends AppCompatActivity {
 
         int userId = SharedPrefManager.getInstance(this).getUser().getId();
 
-        Request request = new Request(userId, selectedItem.getItemId(), address, formattedDate, "Pending", 0, 0, notes);
+        // Use the new constructor for submission (6 parameters)
+        Request request = new Request(userId, selectedItem.getItemId(), address, formattedDate, "Pending", notes);
 
+        // Submit to the base 'requests' table, NOT the view
+        // Ensure your RequestService has a @POST("/requests") method
+        // If not, you'll need to add it: Call<Void> submitRequest(@Body Request request);
         requestService.submitRequest(request).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(UserDashboardActivity.this, "Request submitted!", Toast.LENGTH_SHORT).show();
+                    // Optional: Clear fields after successful submission
+                    edtAddress.setText("");
+                    edtDate.setText("");
+                    edtNotes.setText("");
+                    spinnerItemType.setSelection(0);
                 } else {
                     Toast.makeText(UserDashboardActivity.this,
                             "Failed to submit: " + response.code(), Toast.LENGTH_LONG).show();
-                    Log.e("SUBMIT_REQUEST", "Code: " + response.code() + " Msg: " + response.message());
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "No error body";
+                        Log.e("SUBMIT_REQUEST", "Code: " + response.code() + " Msg: " + response.message() + " Body: " + errorBody);
+                    } catch (Exception e) {
+                        Log.e("SUBMIT_REQUEST", "Error reading error body", e);
+                    }
                 }
             }
 

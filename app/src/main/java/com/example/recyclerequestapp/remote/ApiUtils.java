@@ -9,12 +9,12 @@ public class ApiUtils {
     // // Example: "http://192.168.1.100:3000/" or "http://yourdomain.com:3000/"
     // public static final String BASE_URL = "http://178.128.220.20/2024988895/api/";
 
-    // private static Retrofit getRetrofitInstance() {
-    //     return new Retrofit.Builder()
-    //             .baseUrl(BASE_URL)
-    //             .addConverterFactory(GsonConverterFactory.create())
-    //             .build();
-    // }
+     private static Retrofit getRetrofitInstance() {
+         return new Retrofit.Builder()
+                 .baseUrl(BASE_URL)
+                 .addConverterFactory(GsonConverterFactory.create())
+                 .build();
+     }
 
     // public static UserService getUserService() {
     //     return getRetrofitInstance().create(UserService.class);

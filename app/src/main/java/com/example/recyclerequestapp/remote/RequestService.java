@@ -16,7 +16,7 @@ import retrofit2.http.POST;
 public interface RequestService {
 
     // NOW uses the backend VIEW for enriched data
-    @GET("requests_with_details") // IMPORTANT: Use the actual name of your pRESTige VIEW
+    @GET("requests") // IMPORTANT: Use the actual name of your pRESTige VIEW
     Call<List<Request>> getAllRequests();
 
     // NOW uses the backend VIEW for enriched data
