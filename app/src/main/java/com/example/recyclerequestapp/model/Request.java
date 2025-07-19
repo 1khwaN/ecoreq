@@ -102,7 +102,7 @@ public class Request implements Serializable {
         return status;
     }
 
-    public double getWeight() {
+    public Double getWeight() {
         return weight;
     }
 
