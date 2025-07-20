@@ -18,15 +18,21 @@ public interface RequestService {
 
     // NOW uses the backend VIEW for enriched data
     @GET("requests") // IMPORTANT: Use the actual name of your pRESTige VIEW
-    Call<List<Request>> getAllRequests();
+    Call<List<Request>> getAllRequests(@Header("Authorization")String token);
+
+    @GET("api/requests/user/{userId}") // Double-check this exact API endpoint with your backend
+    Call<List<Request>> getRequestsByUserId(@Header("Authorization") String authToken, @Path("userId") int userId);
 
     // NOW uses the backend VIEW for enriched data
-    @GET("requests_with_details/{id}") // IMPORTANT: Use the actual name of your pRESTige VIEW
-    Call<Request> getRequestById(@Path("request_id") int requestId);
+    @GET("requests/{id}") // IMPORTANT: Use the actual name of your pRESTige VIEW
+    Call<Request> getRequestsById(
+            @Header("Authorization") String token,
+            @Path("request_id") int requestId);
 
     // This still updates the original 'requests' table, not the VIEW
     @PATCH("requests/{id}")
     Call<ResponseBody> updateRequestStatus(
+            @Header("Authorization") String token,
             @Path("request_id") int requestId,
             @Body RequestUpdateBody requestUpdate
     );

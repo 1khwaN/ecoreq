@@ -1,3 +1,4 @@
+// com.example.recyclerequestapp.ViewAllRequestsActivity.java
 package com.example.recyclerequestapp;
 
 import android.content.Intent;
@@ -6,15 +7,19 @@ import android.util.Log;
 import android.view.MenuItem; // Import MenuItem for back button
 import android.widget.Toast;
 
+import androidx.annotation.Nullable; // For onActivityResult if you use it
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration; // Added for visual separation
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout; // Import SwipeRefreshLayout if you intend to use it
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.recyclerequestapp.adapter.RequestAdapter;
 import com.example.recyclerequestapp.model.Request;
+import com.example.recyclerequestapp.model.User; // Import User model
 import com.example.recyclerequestapp.remote.ApiUtils;
 import com.example.recyclerequestapp.remote.RequestService;
+import com.example.recyclerequestapp.SharedPrefManager; // Import SharedPrefManager
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +30,7 @@ import retrofit2.Response;
 
 public class ViewAllRequestsActivity extends AppCompatActivity implements RequestAdapter.OnItemClickListener {
 
-    private RecyclerView recyclerViewRequests;
+    private RecyclerView rvRequestList; // Standardized ID
     private RequestAdapter requestAdapter;
     private List<Request> requestList;
     private RequestService requestService;
@@ -35,51 +40,58 @@ public class ViewAllRequestsActivity extends AppCompatActivity implements Reques
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_all_requests);
+        setContentView(R.layout.activity_view_all_requests); // Ensure this layout exists and has rvRequestList and swipeRefreshLayout
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle("All Requests");
         }
 
-        recyclerViewRequests = findViewById(R.id.recyclerViewRequests);
-        recyclerViewRequests.setLayoutManager(new LinearLayoutManager(this));
+        rvRequestList = findViewById(R.id.rvRequestList); // Standardized ID
+        rvRequestList.setLayoutManager(new LinearLayoutManager(this));
+        rvRequestList.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL)); // Add item decoration
+        registerForContextMenu(rvRequestList); // Register for context menu
 
         // Initialize SwipeRefreshLayout
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout); // Make sure you have this ID in your layout
 
         requestList = new ArrayList<>();
-        requestAdapter = new RequestAdapter(requestList, this); // Pass 'this' as the listener since activity implements it
-        recyclerViewRequests.setAdapter(requestAdapter);
+        // Corrected RequestAdapter constructor call: pass Context, list, and listener
+        requestAdapter = new RequestAdapter(this,requestList, this);
+        rvRequestList.setAdapter(requestAdapter);
 
         // --- FIX START HERE ---
         // 1. Retrieve the token from SharedPrefManager
-        token = SharedPrefManager.getInstance(this).getUser().getToken();
-        Log.d("AUTH_DEBUG", "Token retrieved from SharedPref: " + token);
+        SharedPrefManager spm = new SharedPrefManager(getApplicationContext());
+        User currentUser = spm.getUser();
 
-        // 2. Check if token is available
-        if (token == null || token.isEmpty()) {
+        if (currentUser == null || currentUser.getToken() == null || currentUser.getToken().isEmpty()) {
             Toast.makeText(this, "Authentication token missing. Please log in again.", Toast.LENGTH_LONG).show();
-            // Redirect to login activity or handle appropriately
+            // Redirect to login activity and clear task stack
             startActivity(new Intent(this, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
             finish();
             return; // Stop execution if no token
         }
+        token = currentUser.getToken();
+        Log.d("AUTH_DEBUG", "Token retrieved from SharedPref: " + token);
 
-        // 3. Initialize RequestService with the retrieved token
+        // 2. Initialize RequestService with the retrieved token
         requestService = ApiUtils.getRequestService(token);
         // --- FIX END HERE ---
 
-        fetchRequests();
-
         // Set up refresh listener
         swipeRefreshLayout.setOnRefreshListener(this::fetchRequests);
+
+        // Initial fetch of requests
+        fetchRequests();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        fetchRequests(); // Refresh the list when returning from RequestDetailsActivity
+        // Always refresh the list when the activity comes to foreground
+        // This ensures updates from RequestDetailsActivity are reflected
+        fetchRequests();
     }
 
     private void fetchRequests() {
@@ -88,7 +100,8 @@ public class ViewAllRequestsActivity extends AppCompatActivity implements Reques
             swipeRefreshLayout.setRefreshing(true);
         }
 
-        requestService.getAllRequests().enqueue(new Callback<List<Request>>() {
+        // Pass the authentication token to the API call
+        requestService.getAllRequests("Bearer " + token).enqueue(new Callback<List<Request>>() {
             @Override
             public void onResponse(Call<List<Request>> call, Response<List<Request>> response) {
                 // Hide refreshing indicator
@@ -96,7 +109,7 @@ public class ViewAllRequestsActivity extends AppCompatActivity implements Reques
 
                 if (response.isSuccessful() && response.body() != null) {
                     List<Request> fetchedRequests = response.body();
-                    requestAdapter.setRequestList(fetchedRequests);
+                    requestAdapter.setRequestList(fetchedRequests); // Use setter to update adapter's list
                     Log.d("ViewAllRequests", "Requests fetched successfully: " + fetchedRequests.size());
                 } else {
                     String errorMessage = "Failed to fetch requests: " + response.message();
@@ -110,6 +123,12 @@ public class ViewAllRequestsActivity extends AppCompatActivity implements Reques
                     }
                     Toast.makeText(ViewAllRequestsActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                     Log.e("ViewAllRequests", "Error response: " + response.code() + " " + response.message());
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "No error body";
+                        Log.e("ViewAllRequests", "Error body: " + errorBody);
+                    } catch (Exception e) {
+                        Log.e("ViewAllRequests", "Failed to read error body", e);
+                    }
                 }
             }
 
@@ -126,7 +145,11 @@ public class ViewAllRequestsActivity extends AppCompatActivity implements Reques
     @Override
     public void onItemClick(Request request) {
         Intent intent = new Intent(ViewAllRequestsActivity.this, RequestDetailsActivity.class);
-        intent.putExtra("REQUEST_ID", request.getRequestId());
+        // Ensure you pass the correct key name, "request_id" from previous context
+        intent.putExtra("request_id", request.getRequestId());
+        // If you need to pass more details for display in RequestDetailsActivity without fetching again,
+        // you can put the whole Request object if it's Serializable or Parcelable
+        // intent.putExtra("request_object", request); // if Request implements Serializable/Parcelable
         startActivity(intent);
     }
 
@@ -139,6 +162,4 @@ public class ViewAllRequestsActivity extends AppCompatActivity implements Reques
         }
         return super.onOptionsItemSelected(item);
     }
-
-    // Removed onSupportNavigateUp() as onOptionsItemSelected handles the back button more universally
 }

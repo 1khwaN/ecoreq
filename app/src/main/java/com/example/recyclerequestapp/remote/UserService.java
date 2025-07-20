@@ -1,6 +1,7 @@
 package com.example.recyclerequestapp.remote;
 
 import com.example.recyclerequestapp.model.LoginResponse;
+import com.example.recyclerequestapp.model.User;
 
 import retrofit2.Call;
 import retrofit2.http.Field;

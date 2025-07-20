@@ -1,7 +1,6 @@
 package com.example.recyclerequestapp;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,6 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.recyclerequestapp.model.LoginResponse;
+import com.example.recyclerequestapp.model.User; // Ensure this import is correct
 import com.example.recyclerequestapp.remote.ApiUtils;
 import com.example.recyclerequestapp.remote.UserService;
 
@@ -29,13 +29,20 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         // 🔒 Auto-login check
-        if (SharedPrefManager.getInstance(this).isLoggedIn()) {
-            // Redirect to dashboard if user is already logged in
-            Intent intent = new Intent(LoginActivity.this, UserDashboardActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            return;
+        SharedPrefManager spm = SharedPrefManager.getInstance(this); // Get instance early
+        if (spm.isLoggedIn()) {
+            User loggedInUser = spm.getUser();
+            if (loggedInUser != null) {
+                // Redirect directly without showing login screen if already logged in
+                redirectBasedOnRole(loggedInUser.getRole());
+                return; // Important: exit onCreate after redirection
+            } else {
+                // Fallback for corrupted shared prefs, clear and force login
+                Toast.makeText(this, "Session data corrupted, please log in again.", Toast.LENGTH_LONG).show();
+                spm.logout();
+            }
         }
+
         etUsername = findViewById(R.id.edtUsername);
         etPassword = findViewById(R.id.edtPassword);
         btnLogin = findViewById(R.id.btnLogin);
@@ -55,20 +62,30 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
-                        String token = response.body().getToken();
-                        int userId = response.body().getUserId();
+                        LoginResponse loginResponse = response.body();
 
-                        SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putString("token", token);
-                        editor.putInt("user_id", userId);
-                        editor.apply();
+                        // Create a User object from the LoginResponse data
+                        User user = new User(); // Use the no-arg constructor
+                        user.setId(loginResponse.getUserId()); // Assuming getUserId() from LoginResponse maps to User's id
+                        user.setUsername(loginResponse.getUsername() != null ? loginResponse.getUsername() : usernameOrEmail); // Get from response or input
+                        user.setEmail(loginResponse.getEmail() != null ? loginResponse.getEmail() : usernameOrEmail); // Get from response or input
+                        user.setToken(loginResponse.getToken());
+                        user.setRole(loginResponse.getRole());
+                        // Set other fields from loginResponse if available and needed in User model
+                        // user.setLease(loginResponse.getLease());
+                        // user.setIs_active(loginResponse.getIs_active());
+                        // user.setSecret(loginResponse.getSecret());
+
+                        // Save the complete User object to SharedPreferences
+                        spm.userLogin(user);
 
                         Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(LoginActivity.this, UserDashboardActivity.class));
-                        finish();
+
+                        // Redirect based on the role retrieved from the login response
+                        redirectBasedOnRole(user.getRole());
+
                     } else {
-                        Toast.makeText(LoginActivity.this, "Login failed: Invalid credentials", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Login failed: Invalid credentials or server error.", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -78,5 +95,28 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
         });
+    }
+
+    // New method for role-based redirection
+    private void redirectBasedOnRole(String role) {
+        Intent intent;
+        if (role == null) {
+            Toast.makeText(LoginActivity.this, "Role not found. Redirecting to user dashboard.", Toast.LENGTH_LONG).show();
+            intent = new Intent(LoginActivity.this, UserDashboardActivity.class); // Default if role is missing
+        } else if ("admin".equalsIgnoreCase(role)) { // Check if role is "admin" (case-insensitive)
+            // Assuming ViewAllRequestsActivity is your admin's landing page
+            intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
+            Toast.makeText(LoginActivity.this, "Welcome Admin!", Toast.LENGTH_SHORT).show();
+        } else if ("user".equalsIgnoreCase(role) || "customer".equalsIgnoreCase(role)) { // Check for user/customer role
+            intent = new Intent(LoginActivity.this, UserDashboardActivity.class); // User's landing page
+            Toast.makeText(LoginActivity.this, "Welcome User!", Toast.LENGTH_SHORT).show();
+        } else {
+            // Default or error case: unrecognized role string
+            Toast.makeText(LoginActivity.this, "Unrecognized role. Redirecting to user dashboard.", Toast.LENGTH_LONG).show();
+            intent = new Intent(LoginActivity.this, UserDashboardActivity.class);
+        }
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }

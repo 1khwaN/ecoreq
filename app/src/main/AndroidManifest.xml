@@ -19,7 +19,8 @@
         <service
             android:name=".remote.RecyclableItemService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true"
+            tools:ignore="Instantiatable"></service>
 
         <activity
             android:name=".LoginActivity"
@@ -36,11 +37,8 @@
             android:name=".AdminDashboardActivity"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
         <activity
-            android:name=".UserDashboardActivity"/>
-        <activity android:name=".RequestDetailActivity" />
-        <activity android:name=".ViewRequestsActivity" />
-        <activity android:name=".AdminDashboardActivity"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
+            android:name=".UserDashboardActivity"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"/>
     </application>
 
 </manifest>

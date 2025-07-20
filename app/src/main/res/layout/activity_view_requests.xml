@@ -7,12 +7,12 @@
     android:orientation="vertical"
     android:padding="16dp"
     android:background="#FBF1D6"
-    tools:context=".ViewAllRequestsActivity">
+    tools:context=".ViewRequestsActivity">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="All Requests"
+        android:text="My requests"
         android:textSize="24sp"
         android:textStyle="bold"
         android:gravity="center_horizontal"
@@ -23,7 +23,7 @@
         android:layout_height="match_parent">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvRequestList"
+            android:id="@+id/recyclerViewRequests"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:listitem="@layout/item_request" />

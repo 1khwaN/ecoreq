@@ -51,7 +51,7 @@ public class UserDashboardActivity extends AppCompatActivity {
 
         // View Requests
         btnViewRequests.setOnClickListener(v -> {
-            Intent intent = new Intent(UserDashboardActivity.this, ViewAllRequestsActivity.class);
+            Intent intent = new Intent(UserDashboardActivity.this, ViewRequestsActivity.class);
             startActivity(intent);
         });
         // Load dropdown items from API
@@ -127,7 +127,7 @@ public class UserDashboardActivity extends AppCompatActivity {
             return;
         }
 
-        Request request = new Request(userId, selectedItem.getItemId(), address, formattedDate, "Pending", 0, 0, notes);
+        Request request = new Request(userId, selectedItem.getItemId(), address, formattedDate, "Pending", notes);;
 
         requestService.submitRequest("Bearer " + token, request).enqueue(new Callback<Void>() {
             @Override

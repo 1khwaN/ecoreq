@@ -35,19 +35,19 @@ public class Request implements Serializable {
 
     // --- ENRICHED FIELDS from backend JOINs/VIEW ---
     @SerializedName("username")
-    private String username;
+    private User user;
 
-    @SerializedName("item_name")
-    private String itemName;
+//    @SerializedName("item_name")
+    private RecyclableItem item;
 
-    @SerializedName("price_per_kg") // Assuming your JOIN/VIEW provides this directly
-    private Double pricePerKg;
+//    @SerializedName("price_per_kg") // Assuming your JOIN/VIEW provides this directly
+    private RecyclableItem pricePerKg;
 
 
     // Constructor (updated to include enriched fields)
     public Request(int requestId, int userId, int itemId, String address, String requestDate,
                    String status, Double weight, Double totalPrice, String notes,
-                   String username, String itemName, Double pricePerKg) {
+                   User user, RecyclableItem item, RecyclableItem pricePerKg) {
         this.requestId = requestId;
         this.userId = userId;
         this.itemId = itemId;
@@ -57,8 +57,8 @@ public class Request implements Serializable {
         this.weight = weight;
         this.totalPrice = totalPrice;
         this.notes = notes;
-        this.username = username;
-        this.itemName = itemName;
+        this.user = user;
+        this.item = item;
         this.pricePerKg = pricePerKg;
     }
 
@@ -77,8 +77,8 @@ public class Request implements Serializable {
         this.requestId = 0; // Or some default indicating not yet set
         this.weight = null;
         this.totalPrice = null;
-        this.username = null;
-        this.itemName = null;
+        this.user = null;
+        this.item = null;
         this.pricePerKg = null;
                    }
     // Getter methods
@@ -106,7 +106,7 @@ public class Request implements Serializable {
         return weight;
     }
 
-    public double getTotalPrice() {
+    public Double getTotalPrice() {
         return totalPrice;
     }
 
@@ -131,9 +131,9 @@ public class Request implements Serializable {
 
     // Getters
     public int getRequestId() { return requestId; }
-    public String getUsername() { return username; } // Re-added
-    public String getItemName() { return itemName; } // Re-added
-    public Double getPricePerKg() { return pricePerKg; } // Re-added
+    public User getUser() { return user; } // Re-added
+    public RecyclableItem getItem() { return item; } // Re-added
+    public RecyclableItem getPricePerKg() { return pricePerKg; } // Re-added
 
     // Setters (if needed for internal logic)
     public void setStatus(String status) { this.status = status; }
