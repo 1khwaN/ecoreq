@@ -4,14 +4,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+// Assuming SharedPrefManager is directly in this package, adjust if it's in a 'utils' subpackage
+import com.example.recyclerequestapp.SharedPrefManager;
+
 public class AdminDashboardActivity extends AppCompatActivity {
 
     // Declare buttons
-    Button btnViewAllRequests, btnUpdateRequestStatus, btnAddRecyclableItem, btnUpdateRecyclableItem;
+    Button btnViewAllRequests, btnAddRecyclableItem, btnUpdateRecyclableItem; // btnUpdateRequestStatus removed
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,33 +24,30 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
         // Link buttons with layout
         btnViewAllRequests = findViewById(R.id.btnViewAllRequests);
-        btnUpdateRequestStatus = findViewById(R.id.btnUpdateRequestStatus);
         btnAddRecyclableItem = findViewById(R.id.btnAddRecyclableItem);
         btnUpdateRecyclableItem = findViewById(R.id.btnUpdateRecyclableItem);
 
-        // Button: View All Requests
+        // Button: View All Requests (Navigates to a list of all requests)
         btnViewAllRequests.setOnClickListener(v -> {
-            Intent intent = new Intent(AdminDashboardActivity.this, ViewRequestsActivity.class);
+            Intent intent = new Intent(AdminDashboardActivity.this, ViewAllRequestsActivity.class);
             startActivity(intent);
         });
 
-        // Button: Update Request Status
-        btnUpdateRequestStatus.setOnClickListener(v -> {
-            Intent intent = new Intent(AdminDashboardActivity.this, UpdateRequestStatusActivity.class);
-            startActivity(intent);
-        });
-
-        // Button: Add New Recyclable Item
+        // Button: Add New Recyclable Item (Navigates to a form to add new items)
         btnAddRecyclableItem.setOnClickListener(v -> {
             Intent intent = new Intent(AdminDashboardActivity.this, AddRecyclableItemActivity.class);
             startActivity(intent);
         });
 
-        // Button: Update Recyclable Item
+        // Button: Update Recyclable Item (Navigates to a screen to modify existing items)
         btnUpdateRecyclableItem.setOnClickListener(v -> {
             Intent intent = new Intent(AdminDashboardActivity.this, UpdateRecyclableItemActivity.class);
             startActivity(intent);
         });
+
+        // NOTE: btnUpdateRequestStatus and its listener are removed here.
+        // The functionality for "Update Request Status" will be implemented
+        // within the RequestDetailsActivity (or similar) launched from ViewAllRequestsActivity.
     }
 
     // Show 3-dot menu

@@ -11,7 +11,7 @@ import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.recyclerequestapp.model.Item;
-import com.example.recyclerequestapp.model.Request;
+import com.example.recyclerequestapp.model.Request; // Make sure this imports the correct Request model
 import com.example.recyclerequestapp.remote.ApiUtils;
 import com.example.recyclerequestapp.remote.RequestService;
 
@@ -49,6 +49,12 @@ public class UserDashboardActivity extends AppCompatActivity {
         btnViewRequests = findViewById(R.id.btnViewRequests);
        // btnCancelRequest = findViewById(R.id.btnCancelRequest);
 
+        // View Requests
+        btnViewRequests.setOnClickListener(v -> {
+            Intent intent = new Intent(UserDashboardActivity.this, ViewRequestsActivity.class);
+            startActivity(intent);
+        });
+        // Load dropdown items from API
         loadItemsFromDatabase();
 
         edtDate.setOnClickListener(v -> new DatePickerDialog(this,
@@ -61,9 +67,12 @@ public class UserDashboardActivity extends AppCompatActivity {
         btnSubmitRequest.setOnClickListener(v -> submitRequest());
         btnViewRequests.setOnClickListener(v -> startActivity(new Intent(this, ViewRequestsActivity.class)));
         //btnCancelRequest.setOnClickListener(v -> startActivity(new Intent(this, CancelRequestActivity.class)));
+        btnCancelRequest.setOnClickListener(v -> startActivity(new Intent(this, CancelRequestActivity.class)));
     }
 
     private void loadItemsFromDatabase() {
+        // Assuming getItems is part of your RequestService, or you have another service for items
+        // If items are fetched via a different service, adjust ApiUtils.getRequestService(token).getItems
         requestService.getItems("Bearer " + token).enqueue(new Callback<List<Item>>() {
             @Override
             public void onResponse(Call<List<Item>> call, Response<List<Item>> response) {
@@ -120,15 +129,27 @@ public class UserDashboardActivity extends AppCompatActivity {
             return;
         }
 
-        Request request = new Request(userId, selectedItem.getItemId(), address, formattedDate, "Pending", 0, 0, notes);
+        Request request = new Request(userId, selectedItem.getItemId(), address, formattedDate, "Pending", notes);;
 
         requestService.submitRequest("Bearer " + token, request).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(UserDashboardActivity.this, "Request submitted!", Toast.LENGTH_SHORT).show();
+                    // Optional: Clear fields after successful submission
+                    edtAddress.setText("");
+                    edtDate.setText("");
+                    edtNotes.setText("");
+                    spinnerItemType.setSelection(0);
                 } else {
-                    Toast.makeText(UserDashboardActivity.this, "Submit failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserDashboardActivity.this,
+                            "Failed to submit: " + response.code(), Toast.LENGTH_LONG).show();
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "No error body";
+                        Log.e("SUBMIT_REQUEST", "Code: " + response.code() + " Msg: " + response.message() + " Body: " + errorBody);
+                    } catch (Exception e) {
+                        Log.e("SUBMIT_REQUEST", "Error reading error body", e);
+                    }
                 }
             }
 
