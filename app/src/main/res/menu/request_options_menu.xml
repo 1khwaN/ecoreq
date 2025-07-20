@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/option_details"
+        android:title="View Details" />
+    <item
+        android:id="@+id/option_cancel"
+        android:title="Cancel Request" />
+</menu>

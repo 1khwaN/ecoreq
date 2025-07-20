@@ -4,6 +4,13 @@ import com.google.gson.annotations.SerializedName;
 
 public class Request {
 
+    @SerializedName("request_id")
+    private int requestId;
+
+    public int getRequestId() {
+        return requestId;
+    }
+
     @SerializedName("user_id")
     private int userId;
 
@@ -28,8 +35,10 @@ public class Request {
     @SerializedName("notes")
     private String notes;
 
+    // Constructor
     public Request(int userId, int itemId, String address, String requestDate,
                    String status, double weight, double totalPrice, String notes) {
+
         this.userId = userId;
         this.itemId = itemId;
         this.address = address;
@@ -40,7 +49,7 @@ public class Request {
         this.notes = notes;
     }
 
-    // Getter methods
+    // Getters
     public int getUserId() {
         return userId;
     }
@@ -73,11 +82,15 @@ public class Request {
         return notes;
     }
 
-    // Optional: helpful for debugging
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "Request{" +
-                "userId=" + userId +
+                "requestId=" + requestId +
+                ", userId=" + userId +
                 ", itemId=" + itemId +
                 ", address='" + address + '\'' +
                 ", requestDate='" + requestDate + '\'' +
