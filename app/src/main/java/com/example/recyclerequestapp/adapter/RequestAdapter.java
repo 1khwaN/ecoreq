@@ -17,12 +17,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.recyclerequestapp.R;
-import com.example.recyclerequestapp.RequestDetailActivity;
+import com.example.recyclerequestapp.RequestDetailActivity; // Changed from RequestDetailsActivity? Confirm this name
 import com.example.recyclerequestapp.model.Request;
 import com.example.recyclerequestapp.remote.ApiUtils;
 import com.example.recyclerequestapp.remote.RequestService;
+import com.example.recyclerequestapp.SharedPrefManager; // Import SharedPrefManager
+import com.example.recyclerequestapp.LoginActivity; // Import LoginActivity for redirect
 import com.example.recyclerequestapp.model.User; // Ensure User model is accessible
 import com.example.recyclerequestapp.model.RecyclableItem; // Ensure RecyclableItem model is accessible
+
 
 import java.util.List;
 
@@ -33,24 +36,37 @@ import retrofit2.Response;
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
 
     private Context context;
-    private String authToken = "Bearer 5a13b9cb-e690-4f09-8437-e0d3594c1784"; // You may want to store this in SharedPreferences instead
-
-    public RequestAdapter(Context context, List<Request> requestList) {}
     private List<Request> requestList;
-    private OnItemClickListener listener; // This listener is for the Admin's click action
-    
+    private OnItemClickListener listener;
+    private String authToken; // This will store the RAW token (no "Bearer ")
+
     // Interface for item click events (Admin side)
     public interface OnItemClickListener {
         void onItemClick(Request request); // Admin needs the full Request object to fetch details
     }
 
-    public RequestAdapter(Context context,List<Request> requestList, OnItemClickListener listener) {
+    // Corrected Constructor: Get token from SharedPrefManager
+    public RequestAdapter(Context context, List<Request> requestList, OnItemClickListener listener) {
         this.context = context;
         this.requestList = requestList;
         this.listener = listener;
+
+        // Fetch token from SharedPrefManager
+        SharedPrefManager spm = SharedPrefManager.getInstance(context.getApplicationContext());
+        User loggedInUser = spm.getUser();
+        if (loggedInUser != null) {
+            this.authToken = loggedInUser.getToken();
+        } else {
+            // Handle case where token is not available (e.g., redirect to login)
+            Toast.makeText(context, "Authentication token missing. Please log in again.", Toast.LENGTH_LONG).show();
+            // This might need to be handled in the calling Activity, as adapters shouldn't start activities that clear tasks
+            // For now, logging, but consider how the main Admin activity handles this
+            Log.e("RequestAdapter", "Auth token is null in RequestAdapter constructor!");
+            // Optionally, you could broadcast an intent or use a callback to the Activity
+            // context.startActivity(new Intent(context, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+        }
     }
-    
-    
+
     @NonNull
     @Override
     public RequestViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -61,18 +77,8 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     @Override
     public void onBindViewHolder(@NonNull RequestViewHolder holder, int position) {
         Request request = requestList.get(position);
-
-        holder.text_request_date.setText(request.getRequestDate());
-        holder.text_status.setText(request.getStatus());
-
-        // Long press to show popup menu
-        holder.itemView.setOnLongClickListener(v -> {
-            showPopupMenu(v, request, position);
-            return true;
-        });
+        holder.bind(request, listener); // CALL THE BIND METHOD HERE
     }
-    
-    
 
     private void showPopupMenu(View view, Request request, int position) {
         PopupMenu popupMenu = new PopupMenu(context, view);
@@ -82,14 +88,15 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         popupMenu.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.option_details) {
+                // The listener.onItemClick(request) (used by RequestViewHolder.bind)
+                // is typically for the main click. For the menu, you handle it directly.
+                // The Admin's RequestDetailActivity should also fetch details based on ID,
+                // and its API calls need to be fixed to not add "Bearer "
                 Intent intent = new Intent(context, RequestDetailActivity.class);
                 intent.putExtra("request_id", request.getRequestId());
-                intent.putExtra("date", request.getRequestDate());
-                intent.putExtra("status", request.getStatus());
-                intent.putExtra("totalPrice", request.getTotalPrice());
-                intent.putExtra("address", request.getAddress());
-                intent.putExtra("notes", request.getNotes());
-                intent.putExtra("weight", request.getWeight());
+                // Pass individual fields if RequestDetailActivity expects them separately
+                // Or simply pass the request object if it's Parcelable/Serializable
+                // intent.putExtra("request_object", request); // If Request is Parcelable/Serializable
                 context.startActivity(intent);
                 return true;
             } else if (itemId == R.id.option_cancel) {
@@ -104,29 +111,58 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
 
     private void cancelRequest(Request request, int position) {
-        RequestService RequestService = ApiUtils.getRequestService(authToken);
-        Call<Request> call = RequestService.cancelRequest(authToken, request.getRequestId(), "cancelled");
+        if (authToken == null || authToken.isEmpty()) {
+            Toast.makeText(context, "Authentication token missing for cancellation. Please log in again.", Toast.LENGTH_LONG).show();
+            // Consider directing to login screen or informing the activity to do so
+            return;
+        }
+
+        // CORRECTED: ApiUtils.getRequestService(authToken) already adds "Bearer "
+        // And ensure RequestService.cancelRequest also takes just the raw token
+        RequestService requestService = ApiUtils.getRequestService(authToken);
+        Call<Request> call = requestService.cancelRequest(authToken, request.getRequestId(), "cancelled"); // Check RequestService.cancelRequest method signature.
+        // If it has @Header("Authorization") String auth, pass authToken (raw)
+        // If it combines the header internally, it might not need the auth token here.
 
         call.enqueue(new Callback<Request>() {
             @Override
             public void onResponse(Call<Request> call, Response<Request> response) {
                 if (response.isSuccessful()) {
-                    requestList.get(position).setStatus("cancelled");
-                    notifyItemChanged(position);
-                    Toast.makeText(context, "Request cancelled", Toast.LENGTH_SHORT).show();
+                    // Update only if backend confirms cancellation
+                    if (response.body() != null && "cancelled".equals(response.body().getStatus())) {
+                        requestList.get(position).setStatus("cancelled");
+                        notifyItemChanged(position);
+                        Toast.makeText(context, "Request cancelled successfully!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(context, "Request cancelled, but status update from server was unexpected.", Toast.LENGTH_SHORT).show();
+                        Log.w("CancelRequest", "Server response for cancel was successful but status not 'cancelled'.");
+                        // You might still want to refresh the list or update UI based on your needs
+                    }
                 } else {
-                    Toast.makeText(context, "Failed to cancel: " + response.code(), Toast.LENGTH_SHORT).show();
-                    Log.e("CancelRequest", "Error: " + response.message());
+                    String errorMessage = "Failed to cancel request: " + response.message();
+                    if (response.code() == 401 || response.code() == 403) {
+                        errorMessage = "Session expired or unauthorized. Please log in again.";
+                        // Trigger logout and redirect via the activity context if possible
+                        SharedPrefManager.getInstance(context).logout();
+                        context.startActivity(new Intent(context, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                    }
+                    Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show();
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "No error body";
+                        Log.e("CancelRequest", "Error Body: " + errorBody);
+                    } catch (Exception e) {
+                        Log.e("CancelRequest", "Could not read error body", e);
+                    }
+                    Log.e("CancelRequest", "HTTP Error: " + response.code() + " " + response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<Request> call, Throwable t) {
-                Toast.makeText(context, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("CancelRequest", "Failure: ", t);
+                Toast.makeText(context, "Network error during cancellation: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                Log.e("CancelRequest", "Network failure: ", t);
             }
         });
-        
     }
 
 
@@ -172,6 +208,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             // Populate your views with data from the Request object
             text_request_id.setText("Request ID: #" + request.getRequestId());
 
+            // Check for nulls before accessing nested objects to prevent NullPointerExceptions
             String username = (request.getUser() != null && request.getUser().getUsername() != null) ? request.getUser().getUsername() : "ID: " + request.getUserId();
             text_user_id.setText("User: " + username);
 
@@ -182,6 +219,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             text_request_date.setText("Date: " + (request.getRequestDate() != null ? request.getRequestDate() : "N/A"));
             text_status.setText("Status: " + (request.getStatus() != null ? request.getStatus() : "N/A"));
 
+            // Use getDisplayWeight() etc. if they format the string for display
             text_weight.setText("Weight: " + (request.getDisplayWeight() != null ? request.getDisplayWeight() : "N/A"));
             text_total_price.setText("Total Price: " + (request.getDisplayTotalPrice() != null ? request.getDisplayTotalPrice() : "N/A"));
             text_notes.setText("Notes: " + (request.getDisplayNotes() != null ? request.getDisplayNotes() : "N/A"));
@@ -193,7 +231,5 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
                 }
             });
         }
-    
     }
 }
-

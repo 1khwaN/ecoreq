@@ -40,6 +40,9 @@
         <activity
             android:name=".UserDashboardActivity"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"/>
+
+        <activity android:name=".AddRecyclableItemActivity" />
+        <activity android:name=".UpdateRecyclableItemActivity" />
     </application>
 
 </manifest>

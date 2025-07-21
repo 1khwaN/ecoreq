@@ -22,7 +22,7 @@ public interface RequestService {
     @GET("requests") // IMPORTANT: Use the actual name of your pRESTige VIEW
     Call<List<Request>> getAllRequests(@Header("Authorization")String token);
 
-    @GET("api/requests/user/{userId}") // Double-check this exact API endpoint with your backend
+    @GET("requests/{userId}") // Double-check this exact API endpoint with your backend
     Call<List<Request>> getRequestsByUserId(@Header("Authorization") String authToken, @Path("userId") int userId);
 //    Call<List<Request>> getRequestsByUserId(@Path("userId") int userId);
 
@@ -51,7 +51,7 @@ public interface RequestService {
     Call<List<Request>> getMyRequests();
 
     @FormUrlEncoded
-    @POST("requests")
+    @POST("requests/{id}/status")
     Call<Request> cancelRequest(
             @Header("Authorization") String token,
             @Field("request_id") int requestId,
