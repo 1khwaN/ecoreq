@@ -47,7 +47,7 @@ public class UserDashboardActivity extends AppCompatActivity {
         edtNotes = findViewById(R.id.edtNotes);
         btnSubmitRequest = findViewById(R.id.btnSubmitRequest);
         btnViewRequests = findViewById(R.id.btnViewRequests);
-       // btnCancelRequest = findViewById(R.id.btnCancelRequest);
+//        btnCancelRequest = findViewById(R.id.btnCancelRequest);
 
         // View Requests
         btnViewRequests.setOnClickListener(v -> {
@@ -67,7 +67,7 @@ public class UserDashboardActivity extends AppCompatActivity {
         btnSubmitRequest.setOnClickListener(v -> submitRequest());
         btnViewRequests.setOnClickListener(v -> startActivity(new Intent(this, ViewRequestsActivity.class)));
         //btnCancelRequest.setOnClickListener(v -> startActivity(new Intent(this, CancelRequestActivity.class)));
-        btnCancelRequest.setOnClickListener(v -> startActivity(new Intent(this, CancelRequestActivity.class)));
+//        btnCancelRequest.setOnClickListener(v -> startActivity(new Intent(this, CancelRequestActivity.class)));
     }
 
     private void loadItemsFromDatabase() {

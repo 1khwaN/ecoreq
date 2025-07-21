@@ -2,6 +2,7 @@ package com.example.recyclerequestapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -80,7 +81,9 @@ public class LoginActivity extends AppCompatActivity {
                         spm.userLogin(user);
 
                         Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                        Log.d("TOKEN_DEBUG", "Login success. Received token: " + loginResponse.getToken());
 
+                        Log.d("TOKEN_DEBUG", "SharedPrefManager stored token: " + spm.getUser().getToken());
                         // Redirect based on the role retrieved from the login response
                         redirectBasedOnRole(user.getRole());
 

@@ -256,7 +256,7 @@ public class RequestDetailsActivity extends AppCompatActivity {
                     // Try to get price from currentRequest in case it wasn't set or changed
                     if (currentRequest.getItem().getPricePerKg() != null) {
                         itemUnitPrice = currentRequest.getItem().getPricePerKg();
-                    } else if (currentRequest.getItem() != null && currentRequest.getItem().getPricePerKg() != null) {
+                    } else if (currentRequest.getItem() != null || currentRequest.getItem().getPricePerKg() != null) {
                         itemUnitPrice = currentRequest.getItem().getPricePerKg();
                     }
                 }

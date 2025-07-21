@@ -24,6 +24,7 @@ public interface RequestService {
 
     @GET("api/requests/user/{userId}") // Double-check this exact API endpoint with your backend
     Call<List<Request>> getRequestsByUserId(@Header("Authorization") String authToken, @Path("userId") int userId);
+//    Call<List<Request>> getRequestsByUserId(@Path("userId") int userId);
 
     // NOW uses the backend VIEW for enriched data
     @GET("requests/{id}") // IMPORTANT: Use the actual name of your pRESTige VIEW

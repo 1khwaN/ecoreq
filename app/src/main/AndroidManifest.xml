@@ -33,6 +33,7 @@
         </activity>
         <activity android:name=".CancelRequestActivity" />
         <activity android:name=".ViewAllRequestsActivity" />
+        <activity android:name=".ViewRequestsActivity" />
         <activity
             android:name=".AdminDashboardActivity"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />

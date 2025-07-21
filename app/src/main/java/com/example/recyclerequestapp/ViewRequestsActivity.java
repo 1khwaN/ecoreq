@@ -34,6 +34,8 @@ public class ViewRequestsActivity extends AppCompatActivity {
     private String authToken;
     private int currentUserId;
 
+    private SharedPrefManager spm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +50,7 @@ public class ViewRequestsActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Get the authentication token and user ID from SharedPrefManager
-        SharedPrefManager spm = SharedPrefManager.getInstance(getApplicationContext());
+        spm = SharedPrefManager.getInstance(getApplicationContext());
         User loggedInUser = spm.getUser();
         if (loggedInUser != null) {
             authToken = loggedInUser.getToken();
@@ -74,8 +76,8 @@ public class ViewRequestsActivity extends AppCompatActivity {
 
     private void fetchUserRequests(int userId) {
         // Fetch requests specific to the logged-in user
-        requestService.getRequestsByUserId("Bearer " + authToken, userId).enqueue(new Callback<List<Request>>() {
-            @Override
+// Assuming RetrofitClient adds "Bearer " prefix already
+        requestService.getRequestsByUserId(authToken, userId).enqueue(new Callback<List<Request>>() {            @Override
             public void onResponse(Call<List<Request>> call, Response<List<Request>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     requestList.clear();

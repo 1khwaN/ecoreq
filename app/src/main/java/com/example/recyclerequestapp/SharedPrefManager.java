@@ -2,6 +2,7 @@ package com.example.recyclerequestapp; // Or com.example.recyclerequestapp.share
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.example.recyclerequestapp.model.User; // Ensure correct import
 
@@ -74,11 +75,10 @@ public class SharedPrefManager {
         // String lease = sharedPreferences.getString(KEY_LEASE, null);
         // int is_active = sharedPreferences.getInt(KEY_IS_ACTIVE, 0);
         // String secret = sharedPreferences.getString(KEY_SECRET, null);
-
+        User user = new User(); // Assuming User has a no-arg constructor
 
         // Construct User object only if essential data is available
         if (id != -1 && email != null && username != null && token != null && role != null) {
-            User user = new User(); // Assuming User has a no-arg constructor
             user.setId(id);
             user.setEmail(email);
             user.setUsername(username);
@@ -90,6 +90,8 @@ public class SharedPrefManager {
             // user.setSecret(secret);
             return user;
         }
+        Log.d("TOKEN_DEBUG", "Retrieving token from SharedPreferences: " + user.getToken());
+
         return null; // Return null if user data is incomplete or not found
     }
 
