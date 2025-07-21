@@ -14,6 +14,9 @@ public class SharedPrefManager {
     private static final String KEY_USERNAME = "key_username";
     private static final String KEY_TOKEN = "key_token";
     private static final String KEY_ROLE = "key_role";
+
+    String authToken;
+
     // Add keys for other fields you might want to persist, e.g.:
     // private static final String KEY_LEASE = "key_lease";
     // private static final String KEY_IS_ACTIVE = "key_is_active";

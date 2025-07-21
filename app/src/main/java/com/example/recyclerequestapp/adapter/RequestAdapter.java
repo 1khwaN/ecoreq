@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.recyclerequestapp.R;
+import com.example.recyclerequestapp.RequestDetailActivity;
 import com.example.recyclerequestapp.model.Request;
 import com.example.recyclerequestapp.remote.ApiUtils;
 import com.example.recyclerequestapp.remote.RequestService;
@@ -61,8 +62,8 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     public void onBindViewHolder(@NonNull RequestViewHolder holder, int position) {
         Request request = requestList.get(position);
 
-        holder.tvDate.setText(request.getRequestDate());
-        holder.tvStatus.setText(request.getStatus());
+//        holder.tvDate.setText(request.getRequestDate());
+//        holder.tvStatus.setText(request.getStatus());
 
         // Long press to show popup menu
         holder.itemView.setOnLongClickListener(v -> {

@@ -26,7 +26,7 @@ public class UserDashboardActivity extends AppCompatActivity {
 
     private Spinner spinnerItemType;
     private EditText edtAddress, edtDate, edtNotes;
-    private Button btnSubmitRequest, btnViewRequests, btnCancelRequest;
+    private Button btnSubmitRequest, btnViewRequests;
     private List<Item> itemList = new ArrayList<>();
     private RequestService requestService;
     private String token;
@@ -47,13 +47,6 @@ public class UserDashboardActivity extends AppCompatActivity {
         edtNotes = findViewById(R.id.edtNotes);
         btnSubmitRequest = findViewById(R.id.btnSubmitRequest);
         btnViewRequests = findViewById(R.id.btnViewRequests);
-       // btnCancelRequest = findViewById(R.id.btnCancelRequest);
-
-        // View Requests
-        btnViewRequests.setOnClickListener(v -> {
-            Intent intent = new Intent(UserDashboardActivity.this, ViewRequestsActivity.class);
-            startActivity(intent);
-        });
         // Load dropdown items from API
         loadItemsFromDatabase();
 
@@ -65,9 +58,10 @@ public class UserDashboardActivity extends AppCompatActivity {
         ).show());
 
         btnSubmitRequest.setOnClickListener(v -> submitRequest());
-        btnViewRequests.setOnClickListener(v -> startActivity(new Intent(this, ViewRequestsActivity.class)));
-        //btnCancelRequest.setOnClickListener(v -> startActivity(new Intent(this, CancelRequestActivity.class)));
-        btnCancelRequest.setOnClickListener(v -> startActivity(new Intent(this, CancelRequestActivity.class)));
+        btnViewRequests.setOnClickListener(v -> {
+            Intent intent = new Intent(UserDashboardActivity.this, ViewRequestsActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void loadItemsFromDatabase() {

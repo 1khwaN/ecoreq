@@ -98,13 +98,6 @@
             android:layout_marginBottom="12dp"
             android:text="View My Requests" />
 
-<!--        &lt;!&ndash; Cancel Request &ndash;&gt;-->
-<!--        <Button-->
-<!--            android:id="@+id/btnCancelRequest"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Cancel Request"-->
-<!--            android:layout_marginBottom="12dp" />-->
 
     </LinearLayout>
 </ScrollView>
