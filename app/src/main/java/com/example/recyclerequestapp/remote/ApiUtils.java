@@ -18,7 +18,7 @@ public class ApiUtils {
 
     // public static UserService getUserService() {
     //     return getRetrofitInstance().create(UserService.class);
-    private static final String BASE_URL = "http://178.128.220.20/2024769923/api/";
+    public static final String BASE_URL = "http://178.128.220.20/2024769923/api/";
 
     public static RequestService getRequestService(String token) {
         return RetrofitClient.getClient(BASE_URL, token).create(RequestService.class);

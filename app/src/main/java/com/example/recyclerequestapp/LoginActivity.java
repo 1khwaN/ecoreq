@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            userService.login(usernameOrEmail, password).enqueue(new Callback<LoginResponse>() {
+            userService.login(usernameOrEmail, password).enqueue(new Callback<>() {
                 @Override
                 public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {

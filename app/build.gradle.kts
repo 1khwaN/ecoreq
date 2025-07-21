@@ -36,7 +36,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0") // Or the latest stable version
+    implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0") // Or the latest stable version
 
     // ✅ Retrofit
     implementation(libs.retrofit)
@@ -51,4 +51,4 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-}
+    }

@@ -21,7 +21,7 @@ public interface UserService {
 
     @FormUrlEncoded
     @POST("users/login")
-    Call<User> loginEmail(@Field("email") String email,
+    Call<LoginResponse> loginEmail(@Field("email") String email,
                           @Field("password") String password);
 
     @GET("users/{id}")

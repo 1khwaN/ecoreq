@@ -4,7 +4,7 @@ import com.example.recyclerequestapp.model.Request;
 import java.util.List;
 import com.example.recyclerequestapp.model.RequestUpdateBody;
 import com.example.recyclerequestapp.model.Item;
-import java.util.List;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -48,7 +48,7 @@ public interface RequestService {
     Call<Void> submitRequest(@Header("Authorization") String token, @Body Request request);
 
     @GET("requests")
-    Call<List<Request>> getMyRequests(@Header("Authorization") String token);
+    Call<List<Request>> getMyRequests();
 
     @FormUrlEncoded
     @POST("requests")

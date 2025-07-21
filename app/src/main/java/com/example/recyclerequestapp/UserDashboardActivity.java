@@ -26,7 +26,7 @@ public class UserDashboardActivity extends AppCompatActivity {
 
     private Spinner spinnerItemType;
     private EditText edtAddress, edtDate, edtNotes;
-    private Button btnSubmitRequest, btnViewRequests, btnCancelRequest;
+    private Button btnSubmitRequest, btnViewRequests;
     private List<Item> itemList = new ArrayList<>();
     private RequestService requestService;
     private String token;
