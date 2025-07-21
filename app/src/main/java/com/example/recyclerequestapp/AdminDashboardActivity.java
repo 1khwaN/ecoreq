@@ -4,18 +4,22 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
+import android.widget.Toast; // Added for Toast messages
 
+import androidx.annotation.Nullable; // Added for @Nullable annotation
 import androidx.appcompat.app.AppCompatActivity;
 
-// Assuming SharedPrefManager is directly in this package, adjust if it's in a 'utils' subpackage
 import com.example.recyclerequestapp.SharedPrefManager;
 
 public class AdminDashboardActivity extends AppCompatActivity {
 
     // Declare buttons
-    Button btnViewAllRequests, btnAddRecyclableItem, btnUpdateRecyclableItem; // btnUpdateRequestStatus removed
+    Button btnViewAllRequests, btnAddRecyclableItem, btnUpdateRecyclableItem;
+
+    // Define request codes for startActivityForResult
+    private static final int ADD_ITEM_REQUEST_CODE = 1;
+    private static final int MANAGE_ITEMS_REQUEST_CODE = 2; // For launching ManageRecyclableItemsActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,25 +34,48 @@ public class AdminDashboardActivity extends AppCompatActivity {
         // Button: View All Requests (Navigates to a list of all requests)
         btnViewAllRequests.setOnClickListener(v -> {
             Intent intent = new Intent(AdminDashboardActivity.this, ViewAllRequestsActivity.class);
-            startActivity(intent);
+            startActivity(intent); // No result expected here normally
         });
 
         // Button: Add New Recyclable Item (Navigates to a form to add new items)
         btnAddRecyclableItem.setOnClickListener(v -> {
             Intent intent = new Intent(AdminDashboardActivity.this, AddRecyclableItemActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, ADD_ITEM_REQUEST_CODE); // Use startActivityForResult
         });
 
         // Button: Update Recyclable Item (Navigates to a screen to modify existing items)
+        // This should now launch ManageRecyclableItemsActivity
         btnUpdateRecyclableItem.setOnClickListener(v -> {
-            Intent intent = new Intent(AdminDashboardActivity.this, UpdateRecyclableItemActivity.class);
-            startActivity(intent);
+            Intent intent = new Intent(AdminDashboardActivity.this, ManageRecyclableItemsActivity.class);
+            startActivityForResult(intent, MANAGE_ITEMS_REQUEST_CODE); // Use startActivityForResult
         });
-
-        // NOTE: btnUpdateRequestStatus and its listener are removed here.
-        // The functionality for "Update Request Status" will be implemented
-        // within the RequestDetailsActivity (or similar) launched from ViewAllRequestsActivity.
     }
+
+    // Handle results from launched activities
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == ADD_ITEM_REQUEST_CODE) {
+                Toast.makeText(this, "New item added successfully!", Toast.LENGTH_SHORT).show();
+                // If your dashboard displays a list of items, you might want to refresh it here
+            } else if (requestCode == MANAGE_ITEMS_REQUEST_CODE) {
+                // This indicates that ManageRecyclableItemsActivity completed,
+                // likely after an item was updated.
+                Toast.makeText(this, "Item management completed.", Toast.LENGTH_SHORT).show();
+                // If your dashboard displays a list of items, you might want to refresh it here
+            }
+        } else if (resultCode == RESULT_CANCELED) {
+            // Optional: Handle if the user cancelled the operation in the launched activity
+            if (requestCode == ADD_ITEM_REQUEST_CODE) {
+                Toast.makeText(this, "Add item cancelled.", Toast.LENGTH_SHORT).show();
+            } else if (requestCode == MANAGE_ITEMS_REQUEST_CODE) {
+                Toast.makeText(this, "Item management cancelled.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
     // Show 3-dot menu
     @Override

@@ -20,12 +20,13 @@ public interface RequestService {
     Call<List<Request>> getAllRequests();
 
     // NOW uses the backend VIEW for enriched data
-    @GET("requests_with_details/{id}") // IMPORTANT: Use the actual name of your pRESTige VIEW
+    @GET("requests/{id}") //
     Call<Request> getRequestById(@Path("request_id") int requestId);
 
     // This still updates the original 'requests' table, not the VIEW
     @PATCH("requests/{id}")
     Call<ResponseBody> updateRequestStatus(
+
             @Path("request_id") int requestId,
             @Body RequestUpdateBody requestUpdate
     );

@@ -1,5 +1,6 @@
 package com.example.recyclerequestapp;
 
+import android.content.Intent; // Added for login redirection
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,8 +16,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.recyclerequestapp.model.Request; // No need for User or RecyclableItem models here anymore for fetching
+import com.example.recyclerequestapp.model.Request;
 import com.example.recyclerequestapp.model.RequestUpdateBody;
+import com.example.recyclerequestapp.model.User; // Import User model
 import com.example.recyclerequestapp.remote.ApiUtils;
 import com.example.recyclerequestapp.remote.RequestService;
 
@@ -34,9 +36,11 @@ public class RequestDetailsActivity extends AppCompatActivity {
     private Button btnUpdateStatus;
 
     private int requestId;
-    private double itemUnitPrice = 0.0; // Price per kg for the specific item
+    private double itemUnitPrice = 0.0;
     private RequestService requestService;
-    private Request currentRequest; // To store the fetched request details
+    private Request currentRequest;
+    private String authToken; // Declare authToken
+    private SharedPrefManager spm; // Declare SharedPrefManager
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +65,18 @@ public class RequestDetailsActivity extends AppCompatActivity {
         tvCalculatedPrice = findViewById(R.id.tvCalculatedPriceDetail);
         btnUpdateStatus = findViewById(R.id.btnUpdateStatus);
 
-        requestService = ApiUtils.getRequestService(); // Only need RequestService now
+        // Initialize SharedPrefManager and get token
+        spm = SharedPrefManager.getInstance(getApplicationContext());
+        User user = spm.getUser();
+
+        if (user == null || user.getToken() == null || user.getToken().isEmpty()) {
+            Toast.makeText(this, "Session expired. Please login again.", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            finish();
+            return;
+        }
+        authToken = user.getToken();
+        requestService = ApiUtils.getRequestService(authToken); // <--- Pass authToken here
 
         // Get request ID from Intent
         if (getIntent().hasExtra("REQUEST_ID")) {
@@ -109,11 +124,10 @@ public class RequestDetailsActivity extends AppCompatActivity {
             public void onResponse(Call<Request> call, Response<Request> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     currentRequest = response.body();
-                    displayRequestDetails(currentRequest); // Display all details directly from the enriched Request object
+                    displayRequestDetails(currentRequest);
                 } else {
-                    Toast.makeText(RequestDetailsActivity.this, "Failed to load request: " + response.message(), Toast.LENGTH_SHORT).show();
-                    Log.e("RequestDetails", "Error: " + response.code() + " " + response.message());
-                    finish();
+                    // Handle API errors here as well, similar to AddRecyclableItemActivity
+                    handleApiError(response, "fetch request details");
                 }
             }
 
@@ -128,19 +142,16 @@ public class RequestDetailsActivity extends AppCompatActivity {
 
     private void displayRequestDetails(Request request) {
         tvRequestId.setText("Request ID: #" + request.getRequestId());
-        // Use username and item name from the enriched Request model
         tvRequestUser.setText("User: " + (request.getUsername() != null ? request.getUsername() : "ID: " + request.getUserId()));
         tvRequestItem.setText("Item: " + (request.getItemName() != null ? request.getItemName() : "ID: " + request.getItemId()));
         tvRequestAddress.setText("Address: " + request.getAddress());
         tvRequestDate.setText("Date: " + request.getRequestDate());
         tvRequestNotes.setText("Notes: " + request.getDisplayNotes());
 
-        // Set initial status in spinner
         ArrayAdapter adapter = (ArrayAdapter) spinnerStatus.getAdapter();
         int spinnerPosition = adapter.getPosition(request.getStatus());
         spinnerStatus.setSelection(spinnerPosition);
 
-        // Pre-fill weight and set item unit price for calculation
         if (request.getWeight() != null && request.getWeight() > 0) {
             edtWeight.setText(String.valueOf(request.getWeight()));
         }
@@ -148,7 +159,7 @@ public class RequestDetailsActivity extends AppCompatActivity {
             itemUnitPrice = request.getPricePerKg();
         }
 
-        calculatePrice(); // Calculate initial price based on pre-filled weight and itemUnitPrice
+        calculatePrice();
     }
 
     private void calculatePrice() {
@@ -180,9 +191,8 @@ public class RequestDetailsActivity extends AppCompatActivity {
         if (!weightStr.isEmpty()) {
             try {
                 newWeight = Double.parseDouble(weightStr);
-                // Ensure itemUnitPrice is set before calculating
                 if (itemUnitPrice == 0.0 && currentRequest.getPricePerKg() != null) {
-                    itemUnitPrice = currentRequest.getPricePerKg(); // Fallback in case it wasn't set earlier
+                    itemUnitPrice = currentRequest.getPricePerKg();
                 }
                 newTotalPrice = newWeight * itemUnitPrice;
             } catch (NumberFormatException e) {
@@ -196,21 +206,18 @@ public class RequestDetailsActivity extends AppCompatActivity {
 
         RequestUpdateBody updateBody = new RequestUpdateBody(newStatus, newWeight, newTotalPrice);
 
+        // Add authToken to updateRequestStatus if your RequestService still expects it
+        // based on previous analysis, if RequestService also has its headers managed by RetrofitClient
+        // then you wouldn't pass token here. Let's assume for now, it's consistent with RecyclableItemService
         requestService.updateRequestStatus(requestId, updateBody).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(RequestDetailsActivity.this, "Request updated successfully!", Toast.LENGTH_SHORT).show();
-                    finish(); // Go back to ViewAllRequestsActivity to refresh the list
+                    setResult(RESULT_OK); // To notify the previous activity to refresh
+                    finish();
                 } else {
-                    Toast.makeText(RequestDetailsActivity.this, "Failed to update request: " + response.message(), Toast.LENGTH_LONG).show();
-                    try {
-                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "No error body";
-                        Log.e("RequestDetails", "Update Error Body: " + errorBody);
-                    } catch (Exception e) {
-                        Log.e("RequestDetails", "Could not read error body", e);
-                    }
-                    Log.e("RequestDetails", "Update Error: " + response.code() + " " + response.message());
+                    handleApiError(response, "update request"); // Centralize error handling
                 }
             }
 
@@ -220,6 +227,25 @@ public class RequestDetailsActivity extends AppCompatActivity {
                 Log.e("RequestDetails", "Network update error", t);
             }
         });
+    }
+
+    // Centralized API error handling (copied from AddRecyclableItemActivity)
+    private void handleApiError(Response<?> response, String operation) {
+        String errorMessage = "Failed to " + operation + ": " + response.message();
+        try {
+            String errorBody = response.errorBody() != null ? response.errorBody().string() : "No error body";
+            Log.e("RequestDetails", "Error " + operation + ": Code " + response.code() + ", Message: " + response.message() + ", Body: " + errorBody);
+            if (response.code() == 401 || response.code() == 403) {
+                errorMessage = "Session expired or unauthorized. Please log in again.";
+                spm.logout();
+                startActivity(new Intent(RequestDetailsActivity.this, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                finish();
+            }
+        } catch (Exception e) {
+            Log.e("RequestDetails", "Error reading errorBody", e);
+            errorMessage = "Failed to " + operation + " (Error: " + response.code() + ")";
+        }
+        Toast.makeText(RequestDetailsActivity.this, errorMessage, Toast.LENGTH_LONG).show();
     }
 
     @Override

@@ -16,10 +16,16 @@
         android:theme="@style/Theme.RecycleRequestApp"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-        <service
-            android:name=".remote.RecyclableItemService"
-            android:enabled="true"
-            android:exported="true"></service>
+
+        <activity android:name=".AddRecyclableItemActivity"
+            android:parentActivityName=".AdminDashboardActivity"
+            android:exported="false" />
+        <activity android:name=".ManageRecyclableItemsActivity"
+            android:parentActivityName=".AdminDashboardActivity"
+            android:exported="false" />
+        <activity android:name=".UpdateRecyclableItemActivity"
+            android:parentActivityName=".ManageRecyclableItemsActivity"
+            android:exported="false" />
 
         <activity
             android:name=".LoginActivity"

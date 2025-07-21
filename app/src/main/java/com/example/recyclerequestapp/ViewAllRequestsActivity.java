@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout; // Import SwipeRefreshLayout if you intend to use it
 
-import com.example.recyclerequestapp.adapter.RequestAdapter;
+import com.example.recyclerequestapp.adapter.AdminRequestAdapter;
 import com.example.recyclerequestapp.model.Request;
 import com.example.recyclerequestapp.remote.ApiUtils;
 import com.example.recyclerequestapp.remote.RequestService;
@@ -23,10 +23,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ViewAllRequestsActivity extends AppCompatActivity implements RequestAdapter.OnItemClickListener {
+public class ViewAllRequestsActivity extends AppCompatActivity implements AdminRequestAdapter.OnItemClickListener {
 
     private RecyclerView recyclerViewRequests;
-    private RequestAdapter requestAdapter;
+    private AdminRequestAdapter adminRequestAdapter;
     private List<Request> requestList;
     private RequestService requestService;
     private String token; // Declare token variable
@@ -49,8 +49,8 @@ public class ViewAllRequestsActivity extends AppCompatActivity implements Reques
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout); // Make sure you have this ID in your layout
 
         requestList = new ArrayList<>();
-        requestAdapter = new RequestAdapter(requestList, this); // Pass 'this' as the listener since activity implements it
-        recyclerViewRequests.setAdapter(requestAdapter);
+        adminRequestAdapter = new AdminRequestAdapter(requestList, this); // Pass 'this' as the listener since activity implements it
+        recyclerViewRequests.setAdapter(adminRequestAdapter);
 
         // --- FIX START HERE ---
         // 1. Retrieve the token from SharedPrefManager
@@ -96,7 +96,7 @@ public class ViewAllRequestsActivity extends AppCompatActivity implements Reques
 
                 if (response.isSuccessful() && response.body() != null) {
                     List<Request> fetchedRequests = response.body();
-                    requestAdapter.setRequestList(fetchedRequests);
+                    adminRequestAdapter.setRequestList(fetchedRequests);
                     Log.d("ViewAllRequests", "Requests fetched successfully: " + fetchedRequests.size());
                 } else {
                     String errorMessage = "Failed to fetch requests: " + response.message();

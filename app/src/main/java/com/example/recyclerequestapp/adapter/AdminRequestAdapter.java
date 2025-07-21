@@ -10,7 +10,7 @@ import com.example.recyclerequestapp.R;
 import com.example.recyclerequestapp.model.Request;
 import java.util.List;
 
-public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
+public class AdminRequestAdapter extends RecyclerView.Adapter<AdminRequestAdapter.RequestViewHolder> {
 
     private List<Request> requestList;
     private OnItemClickListener listener;
@@ -21,7 +21,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     }
 
     // Constructor with listener
-    public RequestAdapter(List<Request> requestList, OnItemClickListener listener) {
+    public AdminRequestAdapter(List<Request> requestList, OnItemClickListener listener) {
         this.requestList = requestList;
         this.listener = listener;
     }
