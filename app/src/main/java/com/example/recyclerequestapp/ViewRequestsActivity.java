@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.recyclerequestapp.adapter.RequestAdapter;
+import com.example.recyclerequestapp.adapter.UserRequestAdapter;
 import com.example.recyclerequestapp.model.Request;
 import com.example.recyclerequestapp.model.User;
 import com.example.recyclerequestapp.remote.ApiUtils;
@@ -24,7 +24,7 @@ import retrofit2.Response;
 public class ViewRequestsActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private RequestAdapter adapter;
+    private UserRequestAdapter adapter;
     private RequestService requestService;
     private String token;
 
@@ -58,7 +58,7 @@ public class ViewRequestsActivity extends AppCompatActivity {
             public void onResponse(Call<List<Request>> call, Response<List<Request>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Request> requestList = response.body();
-                    adapter = new RequestAdapter(ViewRequestsActivity.this, requestList);
+                    adapter = new UserRequestAdapter(ViewRequestsActivity.this, requestList);
                     recyclerView.setAdapter(adapter);
                 } else {
                     Toast.makeText(ViewRequestsActivity.this, "Failed to load requests", Toast.LENGTH_SHORT).show();

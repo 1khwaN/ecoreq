@@ -26,7 +26,7 @@ public class SharedPrefManager {
         return mInstance;
     }
 
-    public void storeUser(User user) {
+    public void userLogin(User user) {
         SharedPreferences prefs = mCtx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor e = prefs.edit();
         e.putInt(KEY_ID, user.getId());

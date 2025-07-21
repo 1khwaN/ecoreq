@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
@@ -27,13 +26,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
+public class UserRequestAdapter extends RecyclerView.Adapter<UserRequestAdapter.RequestViewHolder> {
 
     private List<Request> requestList;
     private Context context;
     private String authToken = "Bearer 5a13b9cb-e690-4f09-8437-e0d3594c1784"; // You may want to store this in SharedPreferences instead
 
-    public RequestAdapter(Context context, List<Request> requestList) {
+    public UserRequestAdapter(Context context, List<Request> requestList) {
         this.context = context;
         this.requestList = requestList;
     }

@@ -26,13 +26,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
         // Button: View All Requests
         btnViewAllRequests.setOnClickListener(v -> {
-            Intent intent = new Intent(AdminDashboardActivity.this, ViewRequestsActivity.class);
-            startActivity(intent);
-        });
-
-        // Button: Update Request Status
-        btnUpdateRequestStatus.setOnClickListener(v -> {
-            Intent intent = new Intent(AdminDashboardActivity.this, UpdateRequestStatusActivity.class);
+            Intent intent = new Intent(AdminDashboardActivity.this, ViewAllRequestsActivity.class);
             startActivity(intent);
         });
 

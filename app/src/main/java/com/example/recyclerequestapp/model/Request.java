@@ -7,10 +7,6 @@ public class Request {
     @SerializedName("request_id")
     private int requestId;
 
-    public int getRequestId() {
-        return requestId;
-    }
-
     @SerializedName("user_id")
     private int userId;
 
@@ -27,17 +23,27 @@ public class Request {
     private String status;
 
     @SerializedName("weight")
-    private double weight;
+    private Double weight;
 
     @SerializedName("total_price")
-    private double totalPrice;
+    private Double totalPrice;
 
     @SerializedName("notes")
     private String notes;
 
+    @SerializedName("username")
+    private String username;
+
+    @SerializedName("item_name")
+    private String itemName;
+
+    @SerializedName("price_per_kg") // Assuming your JOIN/VIEW provides this directly
+    private double pricePerKg;
+
     // Constructor
     public Request(int userId, int itemId, String address, String requestDate,
                    String status, double weight, double totalPrice, String notes) {
+
 
         this.userId = userId;
         this.itemId = itemId;
@@ -50,6 +56,10 @@ public class Request {
     }
 
     // Getters
+
+    public int getRequestId() {
+        return requestId;
+    }
     public int getUserId() {
         return userId;
     }
@@ -70,7 +80,7 @@ public class Request {
         return status;
     }
 
-    public double getWeight() {
+    public Double getWeight() {
         return weight;
     }
 
@@ -82,8 +92,29 @@ public class Request {
         return notes;
     }
 
+    public String getUsername()
+    {
+        return username;
+    } // Re-added
+    public String getItemName() {
+        return itemName;
+    } // Re-added
+    public Double getPricePerKg() {
+        return pricePerKg;
+    } // Re-added
+
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getDisplayWeight() {
+        return (weight != null) ? String.format("%.2f kg", weight) : "N/A";
+    }
+    public String getDisplayTotalPrice() {
+        return (totalPrice != null) ? String.format("RM %.2f", totalPrice) : "N/A";
+    }
+    public String getDisplayNotes() {
+        return (notes != null && !notes.isEmpty()) ? notes : "None";
     }
 
     @Override

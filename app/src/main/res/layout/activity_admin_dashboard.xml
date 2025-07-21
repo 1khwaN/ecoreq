@@ -17,13 +17,6 @@
         android:layout_marginBottom="16dp" />
 
     <Button
-        android:id="@+id/btnUpdateRequestStatus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Update Request Status"
-        android:layout_marginBottom="16dp" />
-
-    <Button
         android:id="@+id/btnAddRecyclableItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

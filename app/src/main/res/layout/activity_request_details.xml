@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:padding="24dp"
+    tools:context=".RequestDetailsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvDetailTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Request Details"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:id="@+id/tvRequestIdDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"
+            tools:text="Request ID: #R12345" />
+
+        <TextView
+            android:id="@+id/tvRequestUserDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"
+            tools:text="User: John Doe" />
+
+        <TextView
+            android:id="@+id/tvRequestItemDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"
+            tools:text="Item: Plastic Bottles" />
+
+        <TextView
+            android:id="@+id/tvRequestAddressDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"
+            tools:text="Address: 123 Main St" />
+
+        <TextView
+            android:id="@+id/tvRequestDateDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"
+            tools:text="Date: 2024-07-18" />
+
+        <TextView
+            android:id="@+id/tvRequestNotesDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp"
+            tools:text="Notes: Needs pickup by evening." />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#CCCCCC"
+            android:layout_marginVertical="16dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Update Status &amp; Price"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select Status:"
+            android:textSize="16sp" />
+
+        <Spinner
+            android:id="@+id/spinnerStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:minHeight="48dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enter Item Weight (kg):"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/edtWeightDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="e.g. 3.5"
+            android:inputType="numberDecimal"
+            android:minHeight="48dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Calculated Total Price (RM):"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvCalculatedPriceDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:text="0.00"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/design_default_color_primary" />
+
+        <Button
+            android:id="@+id/btnUpdateStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Update Request"
+            android:backgroundTint="#9EEF74"
+            android:paddingVertical="12dp"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+</ScrollView>
